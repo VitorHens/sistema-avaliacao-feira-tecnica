@@ -1,4 +1,6 @@
 // index.js
+require("dotenv").config();
+
 const Server = require("./Server");
 const logger = require("./src/api/utils/Logger");
 
@@ -37,7 +39,7 @@ process.env.BASE_URL = process.env.BASE_URL || "http://localhost:3000";
         server.run();
 
         logger.info(`✅ ${method} - Servidor iniciado com sucesso!`);
-        logger.info(`🌐 ${method} - Acesse http://localhost/feira-tecnica/Login.html`);
+        logger.info(`🌐 ${method} - Acesse http://localhost:3000`);
 
     } catch (error) {
         // Registra o erro com detalhes completos

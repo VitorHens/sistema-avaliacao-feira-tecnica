@@ -6,20 +6,20 @@
     "doc": "docs"
   },
   "scripts": {
-    "dev": "kill-port 3000 & taskkill /IM nginx.exe /F >nul 2>&1 & cd nginx && start \"\" /B nginx.exe && cd .. && nodemon",
-    "build": "tsc",
+    "dev": "nodemon index.js",
     "start": "node index.js"
   },
   "author": "Hélio Lourenço Esperidião Ferreira",
   "license": "ISC",
-  "description": "Aplicação didática de API MVCS em MYSQL",
+  "description": "Sistema web para cadastro e avaliação de projetos de feira técnica com Node.js, MongoDB e JWT",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.6.0",
-    "mysql2": "^3.11.3",
+    "mysql2": "^3.24.4",
     "qrcode": "^1.5.4",
     "winston": "^3.19.0"
   },

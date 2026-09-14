@@ -19,7 +19,7 @@ class MongoDatabase {
         this.#database = config.database || 'feira-tecnica2026';
         this.#user = config.user || '';
         this.#password = config.password || '';
-        this.#url = this.#buildUrl();
+        this.#url = config.uri || this.#buildUrl();
 
         logger.info(`⬆️ ${method} - Instância criada`, {
             host: this.#host,

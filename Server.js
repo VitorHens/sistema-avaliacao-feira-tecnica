@@ -90,7 +90,11 @@ module.exports = class Server {
         this.#app.use(express.static(publicPath));
 
         // CORS
-        this.#app.use(cors({ origin: "*" }));
+        const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
+        const allowedOrigins = corsOrigin === "*"
+            ? "*"
+            : corsOrigin.split(",").map(origin => origin.trim());
+        this.#app.use(cors({ origin: allowedOrigins }));
         logger.debug(`✅ ${method} - CORS configurado`);
 
         this.#jwtMiddleware = new JwtMiddleware();
@@ -98,11 +102,12 @@ module.exports = class Server {
         // Conecta ao MongoDB
         logger.debug(`🔄 ${method} - Conectando ao MongoDB...`);
         this.#database = new MongoDatabase({
-            host: 'localhost',
-            port: 27017,
-            database: 'feira-tecnica2026',
-            user: '',
-            password: '',
+            uri: process.env.MONGO_URI,
+            host: process.env.MONGO_HOST || 'localhost',
+            port: Number(process.env.MONGO_PORT) || 27017,
+            database: process.env.MONGO_DATABASE || 'feira-tecnica2026',
+            user: process.env.MONGO_USER || '',
+            password: process.env.MONGO_PASSWORD || '',
         });
         await this.#database.connect();
         logger.info(`✅ ${method} - Conectado ao MongoDB com sucesso`);
@@ -138,11 +143,19 @@ module.exports = class Server {
         const totalProfessores = await collection.countDocuments();
 
         if (totalProfessores === 0) {
-            const senhaHash = await bcrypt.hash('Admin@2026', 12);
+            const adminEmail = process.env.ADMIN_EMAIL;
+            const adminPassword = process.env.ADMIN_PASSWORD;
+
+            if (!adminEmail || !adminPassword) {
+                logger.warn(`⚠️ ${method} - Seed ignorado: configure ADMIN_EMAIL e ADMIN_PASSWORD no .env`);
+                return;
+            }
+
+            const senhaHash = await bcrypt.hash(adminPassword, 12);
 
             await collection.insertOne({
                 nome: 'Administrador da Feira',
-                email: 'admin@feira.com',
+                email: adminEmail,
                 senha: senhaHash,
                 role: 'ADMINISTRADOR',
                 dataCadastro: new Date(),
@@ -274,7 +287,7 @@ module.exports = class Server {
             const resposta = {
                 success: false,
                 message: "Ocorreu um erro interno no servidor",
-                data: { stack: error.stack },
+                data: null,
                 error: { message: error.message || "Erro interno", code: error.code },
             };
 

@@ -1,34 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/css/bootstrap.min.css" rel="stylesheet" />
-    <title>Document</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel | Feira Técnica</title>
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
-<body>
-    <div id="divUsuario"></div>
-    <div>
-        <a href="Cargos.html">Cargos</a>
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-primary shadow-sm">
+    <div class="container">
+      <span class="navbar-brand fw-semibold">🎓 Feira Técnica</span>
+      <button id="sair" class="btn btn-outline-light" type="button">Sair</button>
     </div>
-    <div>
-        <a href="Funcionarios.html">Funcionarios</a>
-    </div>
-</body>
-<script type="module">
-    const divUsuario = document.getElementById("divUsuario");
-    let userData = localStorage.getItem("userData");
+  </nav>
 
-    if (userData) {
-        userData = JSON.parse(userData);
-        divUsuario.textContent = "Bem Vindo (" + userData.data.funcionario[0].nomeFuncionario + ")";
-        divUsuario.className = "alert alert-primary";
-    }else{
-         window.location.href = "login.html"; 
+  <main class="container py-5">
+    <div class="p-4 p-md-5 bg-white rounded-4 shadow-sm">
+      <p class="text-primary fw-semibold mb-2">PAINEL DO PROFESSOR</p>
+      <h1 id="boasVindas" class="display-6 fw-bold">Bem-vindo!</h1>
+      <p class="lead text-secondary mb-0">Use o sistema para acompanhar os projetos e registrar avaliações da Feira Técnica.</p>
+    </div>
+  </main>
+
+  <script>
+    const authData = JSON.parse(localStorage.getItem('authData') || 'null');
+    const token = localStorage.getItem('token');
+
+    if (!authData || !token) {
+      window.location.replace('/');
+    } else {
+      const nome = authData.professor?.nome || authData.professor?.name || 'Professor';
+      document.getElementById('boasVindas').textContent = `Bem-vindo, ${nome}!`;
     }
 
-</script>
-
+    document.getElementById('sair').addEventListener('click', () => {
+      localStorage.removeItem('authData');
+      localStorage.removeItem('token');
+      window.location.replace('/');
+    });
+  </script>
+</body>
 </html>
