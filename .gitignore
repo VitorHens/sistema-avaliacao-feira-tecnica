@@ -1,43 +1,23 @@
-# ===== Dependências =====
 node_modules/
-vendor/
-venv/
-env/
-__pycache__/
-
-# ===== Build / Compilados =====
-dist/
-build/
-bin/
-obj/
-*.exe
-*.dll
-*.pyc
-
-# ===== Unity =====
-Library/
-Temp/
-Obj/
-Build/
-Logs/
-UserSettings/
-*.csproj
-*.sln
-
-# ===== Configurações e segredos =====
 .env
-appsettings.Development.json
+.env.*
+!.env.example
 
-# ===== Editor / IDE =====
-.vscode/
-.idea/
-*.suo
-*.user
-
-# ===== Sistema Operacional =====
-Thumbs.db
-.DS_Store
-
-# ===== Logs e temporários =====
+src/api/system/*.log
 *.log
 *.tmp
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db
+
+# Cadastro privado e credenciais de alunos: não publicar em repositórios.
+data/
+backups/
+src/api/database/projetos-feira-2026.json
+feira-tecnica-atualizada/
+*acessos*privado*
+resultado-professores-ids.csv
+resultado-importacao-professores.csv

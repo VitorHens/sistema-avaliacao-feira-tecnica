@@ -1,171 +1,112 @@
-const logger = require("../utils/Logger");
+const asyncHandler = require('../utils/AsyncHandler');
+const { publicBaseUrl } = require('../utils/AppBasePath');
 
 module.exports = class ProjetoController {
-    #projetoService;
+    #service;
 
-    constructor(projetoServiceDependency) {
-        logger.info("⬆️ ProjetoController.constructor()");
-        this.#projetoService = projetoServiceDependency;
+    constructor(service) {
+        this.#service = service;
     }
 
-    store = async (request, response, next) => {
-        try {
-            const projeto =
-                await this.#projetoService.createProjeto(
-                    request.body.projeto
-                );
+    store = asyncHandler(async (request, response) => {
+        const projeto = await this.#service.createProjeto(request.body.projeto || request.body);
+        response.status(201).json({
+            success: true,
+            message: 'Projeto salvo com sucesso',
+            data: { projeto },
+        });
+    });
 
-            response.status(201).json({
-                success: true,
-                message: "Projeto cadastrado com sucesso",
-                data: { projeto }
-            });
-        } catch (error) {
-            logger.error(
-                "❌ ProjetoController.store",
-                {
-                    error: error.message
-                }
-            );
+    index = asyncHandler(async (request, response) => {
+        const projetos = await this.#service.findAll();
+        response.json({ success: true, data: { projetos } });
+    });
 
-            next(error);
-        }
-    };
+    indexPublic = asyncHandler(async (request, response) => {
+        const projetos = await this.#service.findAll();
+        response.json({
+            success: true,
+            data: { projetos: projetos.map(projeto => this.#toPublic(projeto)) },
+        });
+    });
 
-    index = async (request, response, next) => {
-        try {
-            const projetos =
-                await this.#projetoService.findAll();
+    meu = asyncHandler(async (request, response) => {
+        const projeto = await this.#service.findMeuProjeto(request.usuario);
+        response.json({ success: true, data: { projeto } });
+    });
 
-            response.status(200).json({
-                success: true,
-                message:
-                    "Projetos encontrados com sucesso",
-                data: { projetos }
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+    qrMeu = asyncHandler(async (request, response) => {
+        const baseUrl = publicBaseUrl(request);
+        const dados = await this.#service.gerarQrCodeMeuProjeto(request.usuario, baseUrl);
+        response.json({ success: true, data: dados });
+    });
 
-    show = async (request, response, next) => {
-        try {
-            const projeto =
-                await this.#projetoService.findById(
-                    request.params.idProjeto
-                );
+    qrPorMatricula = asyncHandler(async (request, response) => {
+        const baseUrl = publicBaseUrl(request);
+        const dados = await this.#service.gerarQrCodePorMatricula(
+            request.query.matricula,
+            baseUrl
+        );
+        response.json({ success: true, data: dados });
+    });
 
-            response.status(200).json({
-                success: true,
-                message:
-                    "Projeto encontrado com sucesso",
-                data: { projeto }
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+    show = asyncHandler(async (request, response) => {
+        const projeto = await this.#service.findById(request.params.idProjeto);
+        response.json({ success: true, data: { projeto } });
+    });
 
-    showPublic = async (
-        request,
-        response,
-        next
-    ) => {
-        try {
-            const projeto =
-                await this.#projetoService.findById(
-                    request.params.idProjeto
-                );
+    showPublic = asyncHandler(async (request, response) => {
+        const projeto = await this.#service.findById(request.params.idProjeto);
+        response.json({
+            success: true,
+            data: { projeto: this.#toPublic(projeto) },
+        });
+    });
 
-            // Remove matrícula e e-mail da resposta pública.
-            const projetoPublico = {
-                id: projeto.id,
-                tema: projeto.tema,
-                curso: projeto.curso,
+    update = asyncHandler(async (request, response) => {
+        const projeto = await this.#service.updateProjeto(
+            request.params.idProjeto,
+            request.body,
+            request.usuario
+        );
+        response.json({
+            success: true,
+            message: 'Projeto atualizado com sucesso',
+            data: { projeto },
+        });
+    });
 
-                representante: {
-                    nome: projeto.representante.nome,
-                    turma: projeto.representante.turma
-                },
+    destroy = asyncHandler(async (request, response) => {
+        const excluido = await this.#service.deleteProjeto(request.params.idProjeto);
+        response.json({
+            success: true,
+            data: null,
+            message: excluido ? 'Projeto excluído' : 'Projeto não encontrado',
+        });
+    });
 
-                integrantes:
-                    projeto.integrantes.map(
-                        integrante => ({
-                            nome: integrante.nome,
-                            turma: integrante.turma
-                        })
-                    ),
-
-                equipamento: projeto.equipamento,
-                outrosRecursos:
-                    projeto.outrosRecursos,
-                observacoes:
-                    projeto.observacoes
-            };
-
-            response.status(200).json({
-                success: true,
-                message:
-                    "Projeto encontrado com sucesso",
-                data: {
-                    projeto: projetoPublico
-                }
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    update = async (
-        request,
-        response,
-        next
-    ) => {
-        try {
-            const projeto =
-                await this.#projetoService.updateProjeto(
-                    request.params.idProjeto,
-                    request.body
-                );
-
-            response.status(200).json({
-                success: true,
-                message:
-                    "Projeto atualizado com sucesso",
-                data: { projeto }
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    destroy = async (
-        request,
-        response,
-        next
-    ) => {
-        try {
-            const excluido =
-                await this.#projetoService.deleteProjeto(
-                    request.params.idProjeto
-                );
-
-            if (!excluido) {
-                return response.status(404).json({
-                    success: false,
-                    message:
-                        "Projeto não encontrado"
-                });
-            }
-
-            response.status(200).json({
-                success: true,
-                message:
-                    "Projeto excluído com sucesso",
-                data: null
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+    #toPublic(projeto) {
+        return {
+            id: projeto.id,
+            tema: projeto.tema,
+            curso: projeto.curso,
+            representante: projeto.representante
+                ? { nome: projeto.representante.nome, turma: projeto.representante.turma }
+                : null,
+            integrantes: (projeto.integrantes || []).map(integrante => ({
+                nome: integrante.nome,
+                turma: integrante.turma,
+            })),
+            descricao: projeto.descricao || null,
+            objetivo: projeto.objetivo || null,
+            problema: projeto.problema || null,
+            solucao: projeto.solucao || null,
+            diferencial: projeto.diferencial || null,
+            tecnologias: projeto.tecnologias || [],
+            imagens: projeto.imagens || [],
+            links: projeto.links || {},
+            localizacao: projeto.localizacao || null,
+            statusProjeto: projeto.statusProjeto || null,
+        };
+    }
 };

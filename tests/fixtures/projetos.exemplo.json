@@ -1,0 +1,37 @@
+{
+  "sourceSha256": "fixture-publica-sem-dados-reais",
+  "projects": [
+    {
+      "importKey": "exemplo:projeto:1",
+      "sourceRow": 2,
+      "tema": "Horta inteligente",
+      "curso": "INFORMÁTICA",
+      "representante": {
+        "nome": "Aluno Exemplo",
+        "matricula": "90000001",
+        "turma": "2F"
+      },
+      "integrantes": [],
+      "statusProjeto": "PLANEJAMENTO",
+      "imagens": [],
+      "tecnologias": [],
+      "links": {}
+    },
+    {
+      "importKey": "exemplo:projeto:2",
+      "sourceRow": 3,
+      "tema": "Monitor de qualidade do ar",
+      "curso": "ELETRÔNICA",
+      "representante": {
+        "nome": "Estudante Fictício",
+        "matricula": "90000002",
+        "turma": "2E"
+      },
+      "integrantes": [],
+      "statusProjeto": "PLANEJAMENTO",
+      "imagens": [],
+      "tecnologias": [],
+      "links": {}
+    }
+  ]
+}

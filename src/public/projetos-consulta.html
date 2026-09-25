@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
+  <title>Projetos | Feira Técnica</title>
+  <link rel="stylesheet" href="css/evaluator.css">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="evaluator-area experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Projetos</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link" href="dashboard.html"><span class="ico">⌂</span>Painel</a>
+      <a class="nav-link active" href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a>
+      <a class="nav-link" href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a>
+      <a class="nav-link" href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">↗</span>Ranking</a>
+      <a class="nav-link admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar planilha</a>
+      <a class="nav-link admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a>
+      <a class="nav-link admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span id="roleMini">Avaliador</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar"><div><h1>Projetos</h1><p>Encontre uma equipe e abra a avaliação sem perder tempo.</p></div><div class="top-actions"><a class="btn sm" href="avaliacoes-cadastro.html">Nova avaliação</a></div></header>
+    <main id="conteudo" class="evaluator-main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">02 / EXPLORAR · UNIVAP CENTRO</span><h2>Encontre a próxima <em>grande ideia.</em></h2><p>Busque por equipe ou curso e acesse o projeto certo para avaliar.</p></div></section>
+      <div id="alerta" class="alert" role="status" aria-live="polite"></div>
+      <header class="eval-page-head"><div><h2>Projetos da feira</h2><p>Busque pelo projeto, curso ou integrante. Você pode filtrar pela situação da sua avaliação.</p></div><div class="eval-head-actions"><a class="btn ghost" href="index.html">Vitrine pública</a><a id="importarPlanilha" class="btn ghost admin-only" href="receberExcel.html">Importar planilha</a></div></header>
+
+      <section class="eval-panel">
+        <div class="eval-toolbar">
+          <div class="field"><label for="busca">Buscar</label><input id="busca" placeholder="Projeto, curso ou aluno..."></div>
+          <div class="field"><label for="filtroCurso">Curso</label><select id="filtroCurso"><option value="TODOS">Todos os cursos</option></select></div>
+          <div class="field"><label for="filtroStatus">Avaliação</label><select id="filtroStatus"><option value="TODOS">Todos</option><option value="PENDENTE">Pendentes</option><option value="AVALIADO">Já avaliados</option></select></div>
+        </div>
+        <div class="eval-filter-summary"><span id="resumo">Carregando projetos...</span><span>Atalho: pressione <strong>/</strong> para buscar</span></div>
+        <div id="lista" class="eval-project-list"><div class="eval-empty">Carregando projetos...</div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav" aria-label="Navegação rápida">
+  <a href="dashboard.html"><strong>⌂</strong><span>Painel</span></a>
+  <a class="active" href="projetos-consulta.html"><strong>◇</strong><span>Projetos</span></a>
+  <a href="avaliacoes-cadastro.html"><strong>★</strong><span>Avaliar</span></a>
+  <a href="avaliacoes-consulta.html"><strong>✓</strong><span>Histórico</span></a>
+</nav>
+
+<script src="js/auth.js"></script>
+<script>
+if(SESSAO.role==='ALUNO') location.replace('aluno.html');
+const admin=SESSAO.role==='ADMINISTRADOR';
+const nome=SESSAO.usuario.nome||'';
+document.getElementById('roleMini').textContent=admin?'Administrador':'Professor avaliador';
+
+const busca=document.getElementById('busca');
+const filtroCurso=document.getElementById('filtroCurso');
+const filtroStatus=document.getElementById('filtroStatus');
+const resumo=document.getElementById('resumo');
+const lista=document.getElementById('lista');
+const alerta=document.getElementById('alerta');
+let projetos=[],avaliacoes=[];
+
+function avaliacaoMinha(projetoId){return avaliacoes.find(a=>(a.projeto?.id||a.projetoId)===projetoId&&a.avaliador===nome)}
+function avaliacaoQualquer(projetoId){return avaliacoes.find(a=>(a.projeto?.id||a.projetoId)===projetoId)}
+
+function carregarCursos(){
+  const cursos=[...new Set(projetos.map(p=>p.curso).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+  filtroCurso.innerHTML='<option value="TODOS">Todos os cursos</option>'+cursos.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+}
+
+function render(){
+  const termo=normalizarTexto(busca.value);
+  const curso=filtroCurso.value;
+  const status=filtroStatus.value;
+  const filtrados=projetos.filter(p=>{
+    if(curso!=='TODOS'&&p.curso!==curso)return false;
+    const minha=avaliacaoMinha(p.id);
+    if(status==='PENDENTE'&&minha)return false;
+    if(status==='AVALIADO'&&!minha)return false;
+    if(!termo)return true;
+    const texto=normalizarTexto([p.tema,p.curso,p.representante?.nome,...(p.integrantes||[]).map(i=>i.nome),(p.tecnologias||[]).join(' ')].join(' '));
+    return texto.includes(termo);
+  });
+
+  const pendentes=projetos.filter(p=>!avaliacaoMinha(p.id)).length;
+  resumo.textContent=`${filtrados.length} de ${projetos.length} projeto(s) · ${pendentes} pendente(s) para você`;
+  lista.innerHTML=filtrados.map(p=>{
+    const minha=avaliacaoMinha(p.id);
+    const outra=admin?avaliacaoQualquer(p.id):null;
+    const pessoas=[p.representante,...(p.integrantes||[])].filter(Boolean);
+    const estado=minha?'done':(outra?'done':'pending');
+    const textoEstado=minha?'Avaliado por você':(outra?'Avaliado pela banca':'Pendente');
+    const acao=minha
+      ?`<a class="btn ghost sm" href="avaliacoes-editar.html?id=${encodeURIComponent(minha.id)}">Revisar</a>`
+      :`<a class="btn sm" href="avaliacoes-cadastro.html?projeto=${encodeURIComponent(p.id)}">Avaliar</a>`;
+    return `<article class="eval-project-row"><div class="eval-project-main"><div class="eval-row-top"><span class="eval-state ${estado}">${textoEstado}</span><span class="pill">${escapeHtml(p.curso||'Curso')}</span></div><h3>${escapeHtml(p.tema)}</h3><p>${escapeHtml(p.representante?.nome||'Equipe')} · ${pessoas.length} ${pessoas.length===1?'integrante':'integrantes'}${p.localizacao?` · ${escapeHtml(p.localizacao)}`:''}</p></div><div class="eval-row-actions"><a class="btn ghost sm" href="projeto.html?id=${encodeURIComponent(p.id)}">Ver projeto</a>${acao}${admin?`<a class="btn ghost sm" href="projetos-editar.html?id=${encodeURIComponent(p.id)}">Editar</a>`:''}</div></article>`;
+  }).join('')||'<div class="eval-empty">Nenhum projeto encontrado com esses filtros.</div>';
+}
+
+[busca,filtroCurso,filtroStatus].forEach(el=>el.addEventListener(el===busca?'input':'change',render));
+Promise.all([api('/api/v1/projetos'),api('/api/v1/avaliacoes')]).then(([rp,ra])=>{
+  projetos=rp.data.projetos||[];
+  avaliacoes=ra.data.avaliacoes||[];
+  carregarCursos();
+  render();
+}).catch(e=>{mostrarAlerta(alerta,'error',e.message);lista.innerHTML='<div class="eval-empty">Não foi possível carregar os projetos.</div>'});
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

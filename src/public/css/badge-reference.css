@@ -1,0 +1,15 @@
+/* Composition inspirée du modèle fourni, sans QR Code. */
+.badge-page .print-badge{background:linear-gradient(125deg,#086bb9,#075da7);border:1px solid #5b9aca;border-radius:6%;isolation:isolate}
+.badge-page .print-badge:before{content:'';position:absolute;z-index:1;left:-32%;top:8.3%;width:164%;height:67.5%;border-radius:50%;background:#fff;box-shadow:0 2.4cqw 0 #075da7}
+.badge-page .print-badge .badge-blue-top,.badge-page .print-badge .badge-blue-bottom,.badge-page .print-badge .badge-band-bottom{display:none}
+.badge-page .print-badge .badge-clip{display:block;z-index:3;top:3.7%;left:39.5%;width:21%;height:2.3%;border-radius:20px;background:linear-gradient(90deg,#45505a,#35434e);box-shadow:inset 0 1px 2px #152a3e,0 0 0 1px #96aaba}
+.badge-page .print-badge .badge-logo{z-index:3;top:12.7%;left:50%;width:77%;height:17%;padding:0;background:transparent;object-fit:contain;transform:translateX(-50%)}
+.badge-page .print-badge .badge-photo{z-index:3;top:33.2%;left:50%;width:41%;height:36.5%;transform:translateX(-50%);border:2px solid #bcc2c8;border-radius:7px;background:white}
+.badge-page .print-badge .badge-photo.no-image{background:conic-gradient(#edf0f2 25%,#fff 0 50%,#edf0f2 0 75%,#fff 0);background-size:20px 20px}
+.badge-page .print-badge .badge-silhouette svg{width:96%;height:96%;stroke:#c2c7cc;fill:#ffffffbb;stroke-width:1}.badge-page .print-badge .badge-photo-text{background:#1767addd;font-size:8px;padding:5px}
+.badge-page .print-badge .badge-copy{z-index:3;top:81%;bottom:auto;left:6%;width:88%;padding:0;color:#fff}
+.badge-page .print-badge .badge-name{color:#fff!important;font-size:clamp(12px,6.3cqw,24px);font-weight:750;line-height:1.12;text-shadow:none;overflow-wrap:anywhere}
+.badge-page .print-badge .badge-role{color:#fff!important;background:none;border:0;border-radius:0;padding:0;margin:3.5% 0 0;display:block;font-size:clamp(10px,5cqw,18px);font-weight:650;line-height:1.15;text-transform:none;letter-spacing:0;text-shadow:none}
+.badge-page .badge-course,.badge-page .badge-event,.badge-page .badge-footer-note{display:none}
+.badge-page .badge-sheet{background:#eaf3fb;border-color:#d2e3f0}.badge-page .badge-quarter{border-color:#acc9e0}.badge-page .badge-size{background:#e8f3fa;border-color:#c5dceb;color:#235e8c}.badge-page .badge-toggle-clean{background:#f3f9fe;border-color:#cfdfed}
+@media print{.badge-page .print-badge{border-radius:5mm!important;background:linear-gradient(125deg,#086bb9,#075da7)!important}.badge-page .print-badge .badge-logo{top:12.7%!important;width:77%!important;height:17%!important}.badge-page .print-badge .badge-name{font-size:17pt!important;color:#fff!important;line-height:1.12!important}.badge-page .print-badge .badge-role{font-size:13pt!important;color:#fff!important}}

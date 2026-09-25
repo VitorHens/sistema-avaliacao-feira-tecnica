@@ -1,86 +1,16 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login | Feira Técnica</title>
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { min-height: 100vh; background: linear-gradient(135deg, #0d6efd, #6610f2); }
-    .login-card { width: min(100% - 2rem, 430px); border: 0; border-radius: 1.25rem; }
-    .brand-icon { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 1rem; background: #e7f1ff; font-size: 2rem; }
-  </style>
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f32"><meta name="description" content="Explore a Feira Técnica do Colégio Univap — Unidade Centro. Conheça projetos, ideias e descobertas dos estudantes."><title>Feira Técnica 2026 · Univap Centro</title><link rel="stylesheet" href="css/feira.css"><link rel="stylesheet" href="css/story.css"><link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+<link rel="stylesheet" href="css/mobile-site.css">
 </head>
-<body class="d-flex align-items-center justify-content-center py-5">
-  <main class="card login-card shadow-lg">
-    <div class="card-body p-4 p-md-5">
-      <div class="brand-icon mx-auto mb-3" aria-hidden="true">🎓</div>
-      <h1 class="h3 text-center mb-2">Feira Técnica</h1>
-      <p class="text-secondary text-center mb-4">Entre para gerenciar projetos e avaliações.</p>
+<body class="story-site"><a class="skip-link" href="#conteudo">Pular para os projetos</a>
+<header class="site-header"><a class="brand" href="#inicio" aria-label="Feira Técnica, início"><img src="imagens/logo.png" alt="Colégios Univap"><span>FEIRA TÉCNICA<small>UNIDADE CENTRO</small></span></a><nav class="desktop-site-nav" aria-label="Navegação principal"><a href="#historia">Como participar</a><a href="#conteudo">Projetos</a><a href="ranking.html">Ranking da banca ↗</a><a href="ranking-visitantes.html">Ranking dos visitantes ↗</a></nav><a class="access" href="login.html">Acesso interno <span>↗</span></a><button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Abrir menu" aria-controls="mobileMenu" aria-expanded="false"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></button><div class="mobile-menu" id="mobileMenu" hidden><div class="mobile-menu-panel"><div class="mobile-menu-heading"><strong>Explore a feira</strong><button class="mobile-menu-close" type="button" aria-label="Fechar menu">✕</button></div><nav aria-label="Navegação para celular"><a href="#inicio">Início</a><a href="#historia">Como participar</a><a href="#conteudo">Conhecer projetos</a><a href="#sobre">Colégio Univap Centro</a><a href="ranking.html">Ranking da banca</a><a href="ranking-visitantes.html">Ranking dos visitantes</a><a href="login.html">Acesso de alunos e professores</a></nav></div></div></header>
+<main><section id="inicio" class="opening" aria-labelledby="hero-title"><div class="hero-photo" role="img" aria-label="Jardim e edifício do Colégio Univap, Unidade Centro"></div><div class="hero-shade"></div><div class="hero-content"><div class="eyebrow"><span class="live-dot"></span> FEIRA TÉCNICA 2026 <span class="edition">CONHECIMENTO EM MOVIMENTO</span></div><h1 id="hero-title"><span class="desktop-hero-title">O futuro começa<br>com uma boa<br><em>pergunta.</em></span><span class="mobile-hero-title">Uma ideia pode<br><em>mudar tudo.</em></span></h1><p>No Colégio Univap Centro, a curiosidade ganha forma.<br> Descubra as ideias de quem está construindo o amanhã.</p><a class="cta" href="#conteudo">Explore os projetos <span>↗</span></a></div><div class="hero-bottom"><a href="#historia">↓ &nbsp; ROLE PARA DESCOBRIR</a><span>SÃO JOSÉ DOS CAMPOS · SP</span><span>CIÊNCIA. CRIATIVIDADE. CONEXÃO.</span></div><div class="photo-caption">NOSSO PONTO DE PARTIDA<br><strong>Colégio Univap · Unidade Centro</strong></div></section>
+<div class="ticker" aria-hidden="true"><span>IDEIAS QUE TRANSFORMAM</span><span>CONHECIMENTO QUE CONECTA</span><span>O AMANHÃ COMEÇA AQUI</span></div>
+<section id="historia" class="visitor-bridge" aria-labelledby="visit-title"><div class="visitor-intro"><span class="eyebrow">CONHEÇA. CONVERSE. PARTICIPE.</span><h2 id="visit-title">Cada projeto tem uma história.<br><em>Venha conhecer de perto.</em></h2><p>Explore os trabalhos dos alunos, conheça as equipes e descubra as ideias que fazem parte da feira.</p></div><div class="visitor-actions"><a class="cta" href="#conteudo">Conhecer os projetos <span aria-hidden="true">↓</span></a><a class="visitor-evaluate" href="login.html">Sou professor: avaliar <span aria-hidden="true">↗</span></a><p>Visitantes podem avaliar na página de cada projeto, sem login. Professores têm uma avaliação separada.</p></div></section>
 
-      <div id="mensagem" class="alert d-none" role="alert"></div>
-
-      <form id="formLogin" novalidate>
-        <div class="mb-3">
-          <label for="email" class="form-label">E-mail</label>
-          <input id="email" name="email" type="email" class="form-control form-control-lg" autocomplete="username" required>
-        </div>
-        <div class="mb-4">
-          <label for="senha" class="form-label">Senha</label>
-          <input id="senha" name="senha" type="password" class="form-control form-control-lg" autocomplete="current-password" required>
-        </div>
-        <button id="entrar" class="btn btn-primary btn-lg w-100" type="submit">Entrar</button>
-      </form>
-    </div>
-  </main>
-
-  <script type="module">
-    import ApiService from './ApiService.js';
-
-    const api = new ApiService();
-    const form = document.getElementById('formLogin');
-    const mensagem = document.getElementById('mensagem');
-    const botao = document.getElementById('entrar');
-
-    const exibirMensagem = (texto, tipo = 'danger') => {
-      mensagem.textContent = texto;
-      mensagem.className = `alert alert-${tipo}`;
-    };
-
-    form.addEventListener('submit', async (evento) => {
-      evento.preventDefault();
-
-      if (!form.checkValidity()) {
-        form.classList.add('was-validated');
-        return;
-      }
-
-      botao.disabled = true;
-      botao.textContent = 'Entrando...';
-      mensagem.className = 'alert d-none';
-
-      try {
-        const resposta = await api.post('/api/v1/professores/login', {
-          professor: {
-            email: form.email.value.trim(),
-            senha: form.senha.value
-          }
-        });
-
-        if (!resposta.success || !resposta.data?.token) {
-          throw new Error(resposta.message || 'Não foi possível entrar.');
-        }
-
-        localStorage.setItem('authData', JSON.stringify(resposta.data));
-        localStorage.setItem('token', resposta.data.token);
-        window.location.href = '/dashboard.html';
-      } catch (erro) {
-        exibirMensagem(erro.message || 'Erro ao conectar com o servidor.');
-      } finally {
-        botao.disabled = false;
-        botao.textContent = 'Entrar';
-      }
-    });
-  </script>
-</body>
-</html>
+<section id="conteudo" class="catalogo"><div class="container"><div class="catalogo-head"><div><span class="eyebrow">A PRÓXIMA DESCOBERTA É SUA</span><h2>Ideias que saem<br><em>do papel.</em></h2><p>Explore os projetos e conheça quem está por trás de cada ideia.</p></div><div class="catalog-stats"><div><strong id="total">—</strong><span>projetos cadastrados</span></div><div><strong id="cursos">—</strong><span>cursos participantes</span></div></div></div><div class="search-row"><label class="busca"><span aria-hidden="true">⌕</span><input aria-label="Buscar projetos" type="search" id="busca" placeholder="Busque uma ideia, curso ou integrante..."></label><label class="catalog-sort" for="ordem">Ordenar projetos<select id="ordem"><option value="az">Título: A–Z</option><option value="za">Título: Z–A</option></select></label></div><div id="filtros" class="filtros" aria-label="Filtrar por curso"></div><section id="grade" class="grade" aria-live="polite" aria-label="Projetos da feira"><div class="estado">Carregando projetos...</div></section></div></section>
+<section id="sobre" class="school-section"><div><span class="eyebrow">MUITOS OLHARES. UM MESMO FUTURO.</span><h2>O Centro é o<br>nosso ponto de partida<span>.</span></h2></div><div><p>Em São José dos Campos, a Unidade Centro reúne ensino médio e formação técnica. Diferentes áreas se encontram para transformar aprendizado em possibilidades.</p><div class="course-cloud"><span>Administração</span><span>Análises Clínicas</span><span>Eletrônica</span><span>Informática</span><span>Publicidade</span><span>Química</span></div><a class="text-link" href="https://www.univap.br/colegios/unidade-centro" target="_blank" rel="noopener noreferrer">Conheça o colégio ↗</a></div></section>
+<section class="closing"><span class="eyebrow">FEITO DE IDEIAS. FEITO POR PESSOAS.</span><h2>Conheça as ideias.<br><em>Faça parte da feira.</em></h2><p>Visite os projetos e compartilhe sua opinião. As avaliações do público e da banca têm espaços próprios.</p><div class="closing-links"><a class="cta" href="#conteudo">Escolher um projeto <span aria-hidden="true">↗</span></a><a href="login.html">Acesso de alunos e professores</a></div></section></main>
+<footer class="site-footer"><a class="brand" href="index.html"><img src="imagens/logo.png" alt="Univap"><span>FEIRA TÉCNICA<small>UNIDADE CENTRO · 2026</small></span></a><p>Conhecimento que se transforma em projeto.</p><a href="#inicio">Voltar ao início ↑</a></footer><script src="js/public-utils.js"></script><script src="js/catalogo.js"></script><script src="js/story.js"></script><script src="js/mobile-site.js"></script></body></html>

@@ -1,109 +1,84 @@
 const express = require("express");
-const logger = require("../utils/Logger");
 
 module.exports = class ProjetoRouter {
-    #router;
-    #jwtMiddleware;
-    #projetoMiddleware;
-    #projetoController;
+    #router = express.Router();
+    #jwt;
+    #middleware;
+    #controller;
 
-    constructor(
-        jwtMiddlewareDependency,
-        projetoMiddlewareDependency,
-        projetoControllerDependency
-    ) {
-        logger.info("⬆️ ProjetoRouter.constructor()");
-
-        this.#router = express.Router();
-
-        this.#jwtMiddleware =
-            jwtMiddlewareDependency;
-
-        this.#projetoMiddleware =
-            projetoMiddlewareDependency;
-
-        this.#projetoController =
-            projetoControllerDependency;
+    constructor(jwt, middleware, controller) {
+        this.#jwt = jwt;
+        this.#middleware = middleware;
+        this.#controller = controller;
     }
 
     createRoutes = () => {
-        const method =
-            "ProjetoRouter.createRoutes";
-
-        /*
-         * Rota pública:
-         * será aberta quando o visitante escanear
-         * o QR Code.
-         */
+        this.#router.get("/publicos", this.#controller.indexPublic);
         this.#router.get(
             "/publico/:idProjeto",
-            this.#projetoMiddleware.validateIdParam,
-            this.#projetoController.showPublic
+            this.#middleware.validateIdParam,
+            this.#controller.showPublic
         );
 
-        /*
-         * Rotas protegidas:
-         * somente professores com token poderão usar.
-         */
+        this.#router.get(
+            "/meu",
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ALUNO"),
+            this.#controller.meu
+        );
 
-        // Cadastrar projeto.
+        this.#router.get(
+            "/meu/qrcode",
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ALUNO"),
+            this.#controller.qrMeu
+        );
+
+        this.#router.get(
+            "/buscar-matricula",
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ADMINISTRADOR"),
+            this.#controller.qrPorMatricula
+        );
+
         this.#router.post(
             "/",
-            this.#jwtMiddleware.validateToken,
-            this.#projetoMiddleware.validateBody,
-            this.#projetoController.store
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ADMINISTRADOR"),
+            this.#middleware.validateBody,
+            this.#controller.store
         );
 
-        // Listar todos os projetos.
         this.#router.get(
             "/",
-            this.#jwtMiddleware.validateToken,
-            this.#projetoController.index
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ADMINISTRADOR", "AVALIADOR"),
+            this.#controller.index
         );
 
-        // Buscar projeto pelo ID.
         this.#router.get(
             "/:idProjeto",
-            this.#jwtMiddleware.validateToken,
-            this.#projetoMiddleware.validateIdParam,
-            this.#projetoController.show
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ADMINISTRADOR", "AVALIADOR"),
+            this.#middleware.validateIdParam,
+            this.#controller.show
         );
 
-        // Atualizar projeto.
         this.#router.put(
             "/:idProjeto",
-            this.#jwtMiddleware.validateToken,
-            this.#projetoMiddleware.validateIdParam,
-            this.#projetoMiddleware.validateBody,
-            this.#projetoController.update
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ADMINISTRADOR", "ALUNO"),
+            this.#middleware.validateIdParam,
+            this.#middleware.validateUpdateBody,
+            this.#controller.update
         );
 
-        // Excluir projeto.
         this.#router.delete(
             "/:idProjeto",
-            this.#jwtMiddleware.validateToken,
-            this.#projetoMiddleware.validateIdParam,
-            this.#projetoController.destroy
-        );
-
-        logger.info(
-            `✅ ${method} - Rotas configuradas`,
-            {
-                basePath:
-                    "/api/v1/projetos",
-
-                publicRoutes: [
-                    "GET /publico/:idProjeto"
-                ],
-
-                protectedRoutes: [
-                    "POST /",
-                    "GET /",
-                    "GET /:idProjeto",
-                    "PUT /:idProjeto",
-                    "DELETE /:idProjeto"
-                ]
-            }
+            this.#jwt.validateToken,
+            this.#jwt.permitirRoles("ADMINISTRADOR"),
+            this.#middleware.validateIdParam,
+            this.#controller.destroy
         );
 
         return this.#router;

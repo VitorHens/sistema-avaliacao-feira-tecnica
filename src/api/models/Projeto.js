@@ -3,90 +3,38 @@ module.exports = class Projeto {
     #tema;
     #curso;
     #representante;
-    #integrantes;
+    #integrantes = [];
     #equipamento;
-    #outrosRecursos;
-    #observacoes;
-    #dataCadastro;
+    #outrosRecursos = null;
+    #observacoes = null;
+    #dataCadastro = new Date();
+    #alunoId = null;
+    #descricao = null;
+    #objetivo = null;
+    #problema = null;
+    #solucao = null;
+    #diferencial = null;
+    #tecnologias = [];
+    #imagens = [];
+    #links = {};
+    #localizacao = null;
+    #statusProjeto = "PLANEJAMENTO";
 
-    constructor() {
-        console.log("⬆️ Projeto.constructor()");
+    get id() { return this.#id; }
+    set id(v) { if (!v) throw new Error("id é obrigatório."); this.#id = v.toString(); }
 
-        this.#integrantes = [];
-        this.#outrosRecursos = null;
-        this.#observacoes = null;
-        this.#dataCadastro = new Date();
+    get tema() { return this.#tema; }
+    set tema(v) {
+        if (typeof v !== "string" || v.trim().length < 3) throw new Error("tema deve ter pelo menos 3 caracteres.");
+        this.#tema = v.trim();
     }
+    get titulo() { return this.#tema; }
+    set titulo(v) { this.tema = v; }
 
-    get id() {
-        return this.#id;
-    }
-
-    set id(value) {
-        if (!value) {
-            throw new Error("id é obrigatório.");
-        }
-
-        this.#id = value.toString();
-    }
-
-    get tema() {
-        return this.#tema;
-    }
-
-    set tema(value) {
-        if (typeof value !== "string" || value.trim().length < 3) {
-            throw new Error(
-                "tema deve ser uma string com pelo menos 3 caracteres."
-            );
-        }
-
-        this.#tema = value.trim();
-    }
-
-    // Mantém compatibilidade com o nome antigo "titulo".
-    get titulo() {
-        return this.#tema;
-    }
-
-    set titulo(value) {
-        this.tema = value;
-    }
-
-    get curso() {
-        return this.#curso;
-    }
-
-    set curso(value) {
-        if (typeof value !== "string") {
-            throw new Error("curso deve ser uma string.");
-        }
-
-        const normalizarCurso = valor =>
-            String(valor)
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .trim()
-                .toUpperCase();
-
-        const cursosPermitidos = [
-            "ADMINISTRACAO",
-            "ANALISES CLINICAS",
-            "ELETRONICA",
-            "INFORMATICA",
-            "PUBLICIDADE",
-            "QUIMICA"
-        ];
-
-        const cursoNormalizado = normalizarCurso(value);
-
-        if (!cursosPermitidos.includes(cursoNormalizado)) {
-            throw new Error(
-                "curso deve ser um dos seguintes: ADMINISTRAÇÃO, ANÁLISES CLÍNICAS, ELETRÔNICA, INFORMÁTICA, PUBLICIDADE, QUÍMICA"
-            );
-        }
-
-        const cursoFormatado = {
+    get curso() { return this.#curso; }
+    set curso(v) {
+        const norm = String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+        const mapa = {
             ADMINISTRACAO: "ADMINISTRAÇÃO",
             "ANALISES CLINICAS": "ANÁLISES CLÍNICAS",
             ELETRONICA: "ELETRÔNICA",
@@ -94,200 +42,124 @@ module.exports = class Projeto {
             PUBLICIDADE: "PUBLICIDADE",
             QUIMICA: "QUÍMICA"
         };
-
-        this.#curso = cursoFormatado[cursoNormalizado];
+        if (!mapa[norm]) throw new Error("curso informado é inválido.");
+        this.#curso = mapa[norm];
     }
 
-    get representante() {
-        return this.#representante;
-    }
+    get representante() { return this.#representante; }
+    set representante(v) { this.#representante = this.#validarParticipante(v, true, "representante"); }
 
-    set representante(value) {
-        this.#representante = this.#validarParticipante(
-            value,
-            true,
-            "representante"
-        );
-    }
-
-    get integrantes() {
-        return this.#integrantes;
-    }
-
-    set integrantes(value) {
-        if (!Array.isArray(value)) {
-            throw new Error("integrantes deve ser um array.");
-        }
-
-        // O representante mais 9 integrantes totalizam 10 estudantes.
-        if (value.length > 9) {
-            throw new Error(
-                "O projeto pode ter no máximo 10 estudantes, incluindo o representante."
-            );
-        }
-
-        this.#integrantes = value.map((integrante, index) =>
-            this.#validarParticipante(
-                integrante,
-                false,
-                `integrante ${index + 2}`
-            )
-        );
-
+    get integrantes() { return this.#integrantes; }
+    set integrantes(v) {
+        if (!Array.isArray(v)) throw new Error("integrantes deve ser um array.");
+        if (v.length > 9) throw new Error("O projeto pode ter no máximo 10 estudantes.");
+        this.#integrantes = v.map((x, i) => this.#validarParticipante(x, false, `integrante ${i + 2}`));
         this.validarMatriculasUnicas();
     }
 
-    get equipamento() {
-        return this.#equipamento;
+    get equipamento() { return this.#equipamento; }
+    set equipamento(v) {
+        const valor = String(v || "").trim().toUpperCase();
+        const permitidos = ["EQUIPE TRAZ SEU COMPUTADOR", "COMPUTADOR DA ESCOLA"];
+        if (!permitidos.includes(valor)) throw new Error("equipamento informado é inválido.");
+        this.#equipamento = valor;
     }
 
-    set equipamento(value) {
-        const equipamentosPermitidos = [
-            "EQUIPE TRAZ SEU COMPUTADOR",
-            "COMPUTADOR DA ESCOLA"
-        ];
+    get outrosRecursos() { return this.#outrosRecursos; }
+    set outrosRecursos(v) { this.#outrosRecursos = this.#textoOpcional(v, 1200); }
+    get observacoes() { return this.#observacoes; }
+    set observacoes(v) { this.#observacoes = this.#textoOpcional(v, 2000); }
+    get dataCadastro() { return this.#dataCadastro; }
 
-        if (typeof value !== "string") {
-            throw new Error("equipamento deve ser uma string.");
-        }
+    get alunoId() { return this.#alunoId; }
+    set alunoId(v) { this.#alunoId = v ? String(v) : null; }
+    get descricao() { return this.#descricao; }
+    set descricao(v) { this.#descricao = this.#textoOpcional(v, 3000); }
+    get objetivo() { return this.#objetivo; }
+    set objetivo(v) { this.#objetivo = this.#textoOpcional(v, 2000); }
+    get problema() { return this.#problema; }
+    set problema(v) { this.#problema = this.#textoOpcional(v, 2000); }
+    get solucao() { return this.#solucao; }
+    set solucao(v) { this.#solucao = this.#textoOpcional(v, 2500); }
+    get diferencial() { return this.#diferencial; }
+    set diferencial(v) { this.#diferencial = this.#textoOpcional(v, 2000); }
 
-        const equipamento = value.trim().toUpperCase();
-
-        if (!equipamentosPermitidos.includes(equipamento)) {
-            throw new Error(
-                `equipamento deve ser: ${equipamentosPermitidos.join(" ou ")}`
-            );
-        }
-
-        this.#equipamento = equipamento;
+    get tecnologias() { return this.#tecnologias; }
+    set tecnologias(v) {
+        if (v == null || v === "") { this.#tecnologias = []; return; }
+        const lista = Array.isArray(v) ? v : String(v).split(",");
+        this.#tecnologias = [...new Set(lista.map(x => String(x).trim()).filter(Boolean))].slice(0, 20);
     }
 
-    get outrosRecursos() {
-        return this.#outrosRecursos;
+    get imagens() { return this.#imagens; }
+    set imagens(v) {
+        if (v == null) { this.#imagens = []; return; }
+        if (!Array.isArray(v)) throw new Error("imagens deve ser um array.");
+        this.#imagens = v.filter(x => {
+            if (typeof x !== "string" || !x.trim()) return false;
+            const valor = x.trim();
+            if (valor.startsWith("data:image/")) return valor.length <= 1_200_000;
+            try {
+                const url = new URL(valor);
+                return ["http:", "https:"].includes(url.protocol);
+            } catch { return false; }
+        }).slice(0, 5);
     }
 
-    set outrosRecursos(value) {
-        if (value === undefined || value === null || value === "") {
-            this.#outrosRecursos = null;
-            return;
-        }
-
-        if (typeof value !== "string") {
-            throw new Error("outrosRecursos deve ser uma string.");
-        }
-
-        this.#outrosRecursos = value.trim() || null;
+    get links() { return this.#links; }
+    set links(v) {
+        const obj = v && typeof v === "object" ? v : {};
+        this.#links = {
+            github: this.#urlOpcional(obj.github),
+            video: this.#urlOpcional(obj.video),
+            site: this.#urlOpcional(obj.site)
+        };
     }
 
-    get observacoes() {
-        return this.#observacoes;
-    }
+    get localizacao() { return this.#localizacao; }
+    set localizacao(v) { this.#localizacao = this.#textoOpcional(v, 300); }
 
-    set observacoes(value) {
-        if (value === undefined || value === null || value === "") {
-            this.#observacoes = null;
-            return;
-        }
-
-        if (typeof value !== "string") {
-            throw new Error("observacoes deve ser uma string.");
-        }
-
-        this.#observacoes = value.trim() || null;
-    }
-
-    get dataCadastro() {
-        return this.#dataCadastro;
+    get statusProjeto() { return this.#statusProjeto; }
+    set statusProjeto(v) {
+        const valor = String(v || "PLANEJAMENTO").trim().toUpperCase();
+        const permitidos = ["PLANEJAMENTO", "EM DESENVOLVIMENTO", "PRONTO PARA A FEIRA", "FINALIZADO"];
+        if (!permitidos.includes(valor)) throw new Error("status do projeto é inválido.");
+        this.#statusProjeto = valor;
     }
 
     validarMatriculasUnicas() {
-        if (!this.#representante) {
-            return;
-        }
+        if (!this.#representante) return;
+        const matriculas = [this.#representante.matricula, ...this.#integrantes.map(i => i.matricula)];
+        if (new Set(matriculas).size !== matriculas.length) throw new Error("O mesmo estudante não pode aparecer mais de uma vez no projeto.");
+    }
 
-        const matriculas = [
-            this.#representante.matricula,
-            ...this.#integrantes.map(integrante => integrante.matricula)
-        ];
+    #validarParticipante(v, emailObrigatorio, descricao) {
+        if (!v || typeof v !== "object" || Array.isArray(v)) throw new Error(`${descricao} deve ser um objeto.`);
+        if (typeof v.nome !== "string" || v.nome.trim().length < 3) throw new Error(`O nome do ${descricao} é inválido.`);
+        if (typeof v.matricula !== "string" || !v.matricula.trim()) throw new Error(`A matrícula do ${descricao} é obrigatória.`);
+        if (typeof v.turma !== "string" || !v.turma.trim()) throw new Error(`A turma do ${descricao} é obrigatória.`);
+        let email = v.email ? String(v.email).trim().toLowerCase() : null;
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`O e-mail do ${descricao} é inválido.`);
+        if (emailObrigatorio && !email) throw new Error(`O e-mail do ${descricao} é obrigatório.`);
+        return { nome: v.nome.trim(), matricula: v.matricula.trim(), turma: v.turma.trim().toUpperCase(), email };
+    }
 
-        if (new Set(matriculas).size !== matriculas.length) {
-            throw new Error(
-                "O mesmo estudante não pode aparecer mais de uma vez no projeto."
-            );
+    #textoOpcional(v, max) {
+        if (v == null || v === "") return null;
+        if (typeof v !== "string") throw new Error("campo textual inválido.");
+        return v.trim().slice(0, max) || null;
+    }
+
+    #urlOpcional(v) {
+        if (!v) return "";
+        const valor = String(v).trim();
+        try {
+            const url = new URL(valor);
+            if (!["http:", "https:"].includes(url.protocol)) throw new Error();
+            return valor;
+        } catch {
+            throw new Error(`Link inválido: ${valor}`);
         }
     }
 
-    #validarParticipante(value, emailObrigatorio, descricao) {
-        if (!value || typeof value !== "object" || Array.isArray(value)) {
-            throw new Error(`${descricao} deve ser um objeto.`);
-        }
-
-        if (
-            typeof value.nome !== "string" ||
-            value.nome.trim().length < 3
-        ) {
-            throw new Error(
-                `O nome do ${descricao} deve ter pelo menos 3 caracteres.`
-            );
-        }
-
-        if (
-            typeof value.matricula !== "string" ||
-            value.matricula.trim() === ""
-        ) {
-            throw new Error(
-                `A matrícula do ${descricao} é obrigatória.`
-            );
-        }
-
-        if (
-            typeof value.turma !== "string" ||
-            value.turma.trim() === ""
-        ) {
-            throw new Error(
-                `A turma do ${descricao} é obrigatória.`
-            );
-        }
-
-        let email = null;
-
-        if (value.email !== undefined && value.email !== null && value.email !== "") {
-            email = value.email.trim().toLowerCase();
-
-            const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (!formatoEmail.test(email)) {
-                throw new Error(
-                    `O e-mail do ${descricao} está em formato inválido.`
-                );
-            }
-        }
-
-        if (emailObrigatorio && !email) {
-            throw new Error(
-                `O e-mail do ${descricao} é obrigatório.`
-            );
-        }
-
-        return {
-            nome: value.nome.trim(),
-            matricula: value.matricula.trim(),
-            turma: value.turma.trim().toUpperCase(),
-            email
-        };
-    }
-
-    toJSON() {
-        return {
-            id: this.#id,
-            tema: this.#tema,
-            curso: this.#curso,
-            representante: this.#representante,
-            integrantes: this.#integrantes,
-            equipamento: this.#equipamento,
-            outrosRecursos: this.#outrosRecursos,
-            observacoes: this.#observacoes,
-            dataCadastro: this.#dataCadastro
-        };
-    }
 };

@@ -1,97 +1,121 @@
-# 🎓 Sistema de Avaliação da Feira Técnica
+# Sistema de Avaliação da Feira Técnica
 
-Sistema web para cadastrar projetos, professores e avaliações da Feira Técnica. A aplicação reúne uma API REST em Node.js, autenticação JWT, persistência no MongoDB e uma interface web responsiva.
+> Projeto em desenvolvimento para a Feira Técnica 2026 dos Colégios Univap.
 
-## 🚀 Funcionalidades
+Aplicação web para organizar projetos, acessos de alunos e professores, avaliações da banca, votação de visitantes, rankings, crachás e QR Codes.
 
-- Login de professores com senha criptografada e token JWT
-- Cadastro e gerenciamento de professores
-- Cadastro de projetos, representantes e integrantes
-- Registro de avaliações
-- Consulta pública de projetos por QR Code
-- Validação de dados e tratamento centralizado de erros
-- Logs da aplicação
+## Estado do projeto
 
-## 🛠️ Tecnologias
+O sistema está funcional para testes locais, mas ainda precisa ser validado no servidor e na rede que serão usados durante a feira. Dados reais de estudantes não fazem parte deste repositório público.
 
-- Node.js e Express
-- MongoDB
-- JSON Web Token e bcrypt
-- HTML5, CSS3, JavaScript e Bootstrap
-- Nginx opcional para proxy reverso
+## Funcionalidades
 
-## 🏗️ Organização
+- catálogo público com busca, filtros e página de cada projeto;
+- login separado para aluno, avaliador e administrador;
+- edição da apresentação do projeto pelos alunos autorizados;
+- avaliação da banca com histórico e ranking;
+- votação de visitantes com período configurável e códigos opcionais;
+- geração de QR Codes e crachás;
+- cadastro e importação de professores por CSV;
+- importação privada dos projetos e participantes;
+- interface responsiva para computador e celular;
+- proteção de rotas, cookies de sessão, limite de tentativas e validações.
 
-O back-end segue uma arquitetura em camadas:
+## Tecnologias
+
+- Node.js e Express;
+- MongoDB;
+- JavaScript, HTML e CSS;
+- JWT, bcrypt e cookies `HttpOnly`;
+- testes nativos do Node.js.
+
+## Estrutura
 
 ```text
-src/api/
-├── controllers/
-├── dao/
-├── database/
-├── middleware/
-├── models/
-├── routes/
-├── services/
-└── utils/
+├── src/
+│   ├── api/
+│   │   ├── controllers/
+│   │   ├── dao/
+│   │   ├── database/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── services/
+│   └── public/
+│       ├── css/
+│       ├── imagens/
+│       └── js/
+├── tests/
+├── tools/
+├── nginx/conf/
+├── Server.js
+└── index.js
 ```
 
-## ▶️ Como executar
+## Executar localmente
 
-1. Clone o repositório e entre na pasta:
+Requisitos: Node.js 20 ou superior e MongoDB em execução.
 
 ```bash
 git clone https://github.com/VitorHens/sistema-avaliacao-feira-tecnica.git
 cd sistema-avaliacao-feira-tecnica
+npm ci
+npm start
 ```
 
-2. Instale as dependências:
+Abra `http://localhost:3000/feira/`. Para desenvolvimento com reinício automático, use `npm run dev`.
+
+As variáveis disponíveis estão documentadas em [`.env.example`](.env.example). O projeto não carrega o arquivo automaticamente: configure as variáveis no ambiente do processo.
+
+## Dados privados da feira
+
+Nomes, matrículas, e-mails e credenciais devem permanecer fora do GitHub. O diretório `data/` é ignorado pelo Git.
+
+Para gerar localmente a carga de projetos a partir do CSV oficial:
+
+```powershell
+node tools/incorporar-projetos.cjs "C:\caminho\cadastro-feira.csv"
+```
+
+O comando cria `data/projetos-feira-2026.json`. A aplicação importa esse arquivo sem substituir apresentações já editadas. Também é possível definir outro caminho com `PROJECTS_DATA_FILE`.
+
+Consulte [Configuração e dados](docs/CONFIGURACAO.md) antes de distribuir acessos.
+
+## Testes e qualidade
 
 ```bash
-npm install
+npm test
+node tools/check-frontend.cjs
+npm audit --omit=dev
 ```
 
-3. Crie o arquivo `.env` a partir do exemplo e altere os valores:
+Na revisão de 25 de setembro de 2026, os 40 testes passaram, 32 scripts do front-end foram validados e a auditoria encontrou 0 vulnerabilidades conhecidas nas dependências de produção.
 
-```bash
-cp .env.example .env
-```
+## Implantação
 
-No Windows PowerShell, use `Copy-Item .env.example .env`.
+O sistema aceita publicação sob o prefixo `/feira/` e inclui uma configuração mínima de Nginx. Antes de usar em produção, configure HTTPS, segredos persistentes, URL pública dos QR Codes e backup do MongoDB.
 
-4. Inicie o MongoDB e execute a aplicação:
+Veja o passo a passo em [Implantação](docs/IMPLANTACAO.md).
 
-```bash
-npm run dev
-```
+## Segurança
 
-5. Abra [http://localhost:3000](http://localhost:3000).
+- `.env`, `data/`, logs, backups e credenciais não são versionados;
+- segredos JWT e da votação devem ter pelo menos 32 caracteres;
+- cookies de sessão usam `HttpOnly` e `SameSite=Lax`;
+- contas de teste só podem ser ativadas fora de produção;
+- respostas internas não expõem pilhas de erro ao usuário;
+- senhas são armazenadas com bcrypt.
 
-## 🔐 Segurança
+A senha inicial baseada na turma e a senha inicial dos avaliadores são temporárias e devem ser trocadas no primeiro acesso. Leia [Segurança](SECURITY.md) antes de publicar o sistema na internet.
 
-- Credenciais e chaves ficam no `.env`, que não é versionado.
-- A chave `JWT_SECRET` deve possuir pelo menos 32 caracteres.
-- Defina `ADMIN_EMAIL` e `ADMIN_PASSWORD` para criar o primeiro administrador quando o banco estiver vazio.
-- Em produção, restrinja `CORS_ORIGIN` ao endereço real da interface.
+## Próximos passos
 
-## 📡 Principais rotas
+- validar todos os fluxos com o MongoDB e a rede reais da escola;
+- revisar as pendências da planilha antes de liberar contas;
+- adicionar imagens demonstrativas sem dados pessoais;
+- acompanhar a execução automática dos testes no GitHub Actions;
+- realizar teste de restauração do backup.
 
-```text
-POST   /api/v1/professores/login
-GET    /api/v1/professores
-POST   /api/v1/professores
-GET    /api/v1/projetos
-POST   /api/v1/projetos
-GET    /api/v1/avaliacoes
-POST   /api/v1/avaliacoes
-```
+## Créditos
 
-Com exceção do login e das rotas públicas documentadas no código, os recursos exigem o cabeçalho `Authorization: Bearer <token>`.
-
-## 🎯 Objetivo
-
-Aplicar conceitos de API REST, autenticação, banco de dados NoSQL, arquitetura em camadas e desenvolvimento de interfaces em um sistema completo para a Feira Técnica.
-
----
-
-Projeto acadêmico desenvolvido para a Feira Técnica.
+Projeto acadêmico desenvolvido a partir da base do professor Hélio Lourenço Esperidião Ferreira, com organização e evolução no repositório de Vitor Hens.

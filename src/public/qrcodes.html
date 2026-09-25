@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QR Code e estande | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+<link rel="stylesheet" href="css/qr-print.css">  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link  " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link active admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link  admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>QR Code e estande</h1><p id="qrDescricao">Identificação do projeto</p></div><div class="top-actions"><a class="btn ghost sm" href="dashboard.html">Painel</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">04 / COMPARTILHAR · UNIVAP CENTRO</span><h2>Uma câmera. <em>Uma descoberta.</em></h2><p>O visitante aponta a câmera e abre a página do projeto, sem login e sem pesquisar a equipe.</p></div></section><section class="card qr-controls"><div class="section-title"><div><h2>Seu projeto, ao alcance da câmera.</h2><p>Compartilhe a página pública com quem visitar o estande.</p></div></div><div id="alerta" class="alert" role="status" aria-live="polite"></div><div class="qr-flow"><article><b>01</b><strong>Encontre a equipe</strong><p>Use a matrícula de qualquer integrante.</p></article><article><b>02</b><strong>Prepare o estande</strong><p>Baixe o QR ou imprima a placa pronta.</p></article><article><b>03</b><strong>Abra a descoberta</strong><p>Na câmera do celular, toque no link para abrir o projeto.</p></article></div><button id="retryQr" type="button" class="btn ghost" hidden>Tentar gerar novamente</button><p id="qrFeedback" class="qr-feedback" role="status" aria-live="polite"></p><form id="buscarQr" class="toolbar"><div class="field"><label for="matricula">Matrícula de um integrante</label><input id="matricula" name="matricula" required placeholder="Ex.: 20260001"></div><button class="btn" type="submit">Gerar QR do projeto</button></form></section><section id="resultadoQr" class="qr-result" hidden><div class="qr-actions" style="margin-top:24px"><a id="baixarImagem" class="btn" download="qrcode-projeto.png">Baixar QR Code</a><a id="abrirProjeto" class="btn ghost" target="_blank" rel="noopener">Abrir página</a><button id="copiarLinkQr" class="btn ghost" type="button">Copiar link</button><button id="imprimirQr" class="btn ghost" disabled>Imprimir placa A4</button></div><code id="enderecoQr"></code><p class="print-help">O código contém o link direto do projeto. Antes de imprimir, teste com um celular conectado à rede que será usada na feira. Dobre a folha ao meio para apoiar a placa no estande.</p><div class="stand-preview"><article class="stand-face"><img src="imagens/logo.png" alt="UNIVAP"><span class="eyebrow">Feira Técnica 2026</span><h2 data-qr-tema></h2><img data-qr-imagem alt="QR Code para a página do projeto"><p>Conheça nosso projeto</p><small>Aponte a câmera do celular para o QR Code.</small></article><article class="stand-face"><img src="imagens/logo.png" alt="UNIVAP"><span class="eyebrow">Feira Técnica 2026</span><h2 data-qr-tema></h2><img data-qr-imagem alt="QR Code para a página do projeto"><p>Conheça nosso projeto</p><small>Aponte a câmera do celular para o QR Code.</small></article></div></section></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script src="js/qrcodes.js"></script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script><script src="js/experience.js"></script>
+</body></html>

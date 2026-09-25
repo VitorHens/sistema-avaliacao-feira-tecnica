@@ -1,0 +1,54 @@
+/* Layouts do catálogo, votação e ranking. A identidade é definida por visual-system.css. */
+.visitor-rating{margin-top:24px}.visitor-rating fieldset{border:0;padding:0}.visitor-rating-options{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.visitor-rating-options label{position:relative;cursor:pointer}.visitor-rating-options input{position:absolute;opacity:0;width:1px;height:1px}.visitor-rating-options label>span{display:block;padding:12px 17px;border:1px solid #b9bec5;border-radius:8px;color:#101f32;background:#faf9f6}.visitor-rating-options input:checked+span{background:var(--brand-orange-light);border-color:var(--brand-orange)}.visitor-rating-options input:focus-visible+span{outline:3px solid #101f32;outline-offset:3px}.visitor-rating .visitor-summary{font-weight:650;color:#101f32}.visitor-rating form{margin:20px 0}.visitor-rating .visitor-feedback{color:#384655}
+
+
+/* Refinamento editorial: azul original preservado, superfícies neutras. */
+.story-site,.experience{font-family:'Segoe UI',Arial,sans-serif;color:#172a3c}
+.story-site .catalogo{background:#f4f4f2}
+.story-site .catalogo-head{align-items:flex-end;gap:32px}
+.story-site .catalogo-head p{font-size:15px;line-height:1.7;max-width:560px}
+.story-site .search-row{gap:20px;margin:28px 0 20px}
+.story-site .search-row>span{display:none}
+.story-site .busca{width:620px;background:#fff;border-color:#d3d8dc;padding:0 16px}
+.story-site .busca input{border:0!important;box-shadow:none!important;background:transparent;min-height:50px;font:inherit;font-size:14px}
+.story-site .busca:focus-within{outline:2px solid #101f32;outline-offset:3px}
+.story-site .grade{align-items:stretch;gap:24px}
+.story-site .card-projeto{background:#fff;border:1px solid #d9dde1;border-radius:12px;box-shadow:0 4px 16px #101f3207}
+.story-site .card-projeto .cover:not(:has(img)){min-height:150px;background:#101f32;background-image:none;align-items:stretch}
+.story-site .card-projeto .cover-info{background:#101f32;padding:24px;position:relative;width:100%;display:flex;flex-direction:column;justify-content:center}
+.story-site .cover-info small{font-size:10px;line-height:1.5;letter-spacing:1px;color:#d5dce4;margin-bottom:10px}
+.story-site .cover-info strong{font-size:20px;line-height:1.35;overflow-wrap:anywhere;letter-spacing:-.3px}
+.story-site .cover img{height:190px}
+.story-site .card-body{padding:24px}
+.story-site .card-body>p{font-size:14px;line-height:1.75;color:#56616e;margin:18px 0 24px}
+.story-site .card-foot{gap:16px;padding-top:20px}
+.story-site .card-foot .botao{min-height:42px;padding:11px 16px;border-color:#101f32}
+.story-site .meta .tag{background:#f0f2f4;color:#384655;border-color:#dde2e6;font-size:10px;letter-spacing:.3px}
+.story-site .team{font-size:12px;color:#56616e}
+.story-site .card-projeto:hover{transform:translateY(-2px);box-shadow:0 10px 24px #101f3210}
+.experience .ranking-members{font-size:13px;line-height:1.65;color:#52606f;white-space:normal;overflow-wrap:anywhere;margin:10px 0}
+.experience .ranking-project .ranking-members{display:block;max-width:640px}
+.experience .podium-card{display:flex;flex-direction:column;gap:8px}
+.experience .podium-card .ranking-members{flex:1}
+.experience .ranking-row{align-items:center;padding:22px;gap:24px}
+@media(max-width:700px){.story-site .catalogo-head{align-items:start}.story-site .card-body,.story-site .card-projeto .cover-info{padding:20px}.experience .ranking-row{padding:16px;gap:12px}.experience .ranking-members{font-size:12px}}
+/* A prévia também usa a identidade neutra. */
+.preview-banner{background:var(--surface-soft)!important;color:#101f32!important}
+
+/* Ranking compacto: medalha proporcional e equipe em evidência. */
+.experience .podium{align-items:stretch}
+.experience .podium-card{padding:24px;gap:10px;min-height:0}
+.experience .podium-medal{display:grid;place-items:center;align-self:flex-start;width:48px;height:48px;min-height:48px;border-radius:50%;font-size:22px;line-height:1;background:#101f32;color:var(--brand-orange-light);margin:0 0 6px}
+.experience .podium-card .ranking-members{flex:0;margin:0;font-size:13px;line-height:1.6}
+.experience .podium-card h2{margin:0;font-size:21px;line-height:1.35}
+.experience .podium-card>strong{font-size:32px;line-height:1.2;margin:8px 0 0}
+.experience .podium-card>a{margin-top:12px}
+.experience .podium.single-team{grid-template-columns:1fr}
+.experience .single-team .podium-card{display:grid;grid-template-columns:64px minmax(0,1fr) 150px;column-gap:20px;row-gap:8px;align-items:center}
+.experience .single-team .podium-medal{grid-column:1;grid-row:1/5;align-self:center;margin:0}
+.experience .single-team .podium-card>span,.experience .single-team .podium-card>h2,.experience .single-team .podium-card>.ranking-members{grid-column:2}
+.experience .single-team .podium-card>strong{grid-column:3;grid-row:1/3;text-align:right;margin:0}
+.experience .single-team .podium-card>small{grid-column:3;grid-row:3;text-align:right}
+.experience .single-team .podium-card>a{grid-column:2;margin:4px 0 0}
+@media(max-width:600px){.experience .single-team .podium-card{grid-template-columns:48px minmax(0,1fr);padding:20px;column-gap:14px}.experience .single-team .podium-card>strong,.experience .single-team .podium-card>small{grid-column:2;grid-row:auto;text-align:left}.experience .single-team .podium-medal{grid-row:1/3}.experience .ranking-row{grid-template-columns:32px minmax(0,1fr) 60px}.experience .ranking-count{display:none}}
+.experience .ranking-hero .selo{display:inline-flex;width:auto;max-width:100%;padding:6px 10px;line-height:1.4}.experience .ranking-hero #refreshRanking{white-space:nowrap}

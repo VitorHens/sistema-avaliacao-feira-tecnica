@@ -1,0 +1,45 @@
+/* Fonte única da identidade. Tons de implementação da direção azul/laranja solicitada. */
+:root {
+  --brand-navy: #101f32;
+  --brand-blue: #234661;
+  --brand-orange: #c65013;
+  --brand-orange-hover: #a6400e;
+  --brand-orange-light: #ffb47e;
+  --surface: #ffffff;
+  --canvas: #f5f6f8;
+  --surface-soft: #edf1f5;
+  --text: #243244;
+  --text-muted: #586779;
+  --border: #d9e0e7;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-card: 16px;
+  --elevation: 0 4px 24px #101f3208;
+  --font-body: 'Segoe UI', Arial, sans-serif;
+  --font-editorial: Georgia, 'Times New Roman', serif;
+  /* Compatibilidade com os componentes operacionais existentes. */
+  --navy: var(--brand-navy);
+  --blue: var(--brand-blue);
+  --ink: var(--text);
+  --muted: var(--text-muted);
+  --line: var(--border);
+  --bg: var(--canvas);
+  --soft: var(--surface-soft);
+  --paper: var(--surface);
+  --accent: var(--brand-orange);
+  --accent-ink: #fff;
+  --shadow: var(--elevation);
+  --school-navy: var(--brand-navy);
+  --school-blue: var(--brand-blue);
+  --school-line: var(--border);
+  --school-muted: var(--text-muted);
+  --story-navy: var(--brand-navy);
+  --story-lime: var(--brand-orange-light);
+  --story-paper: var(--canvas);
+}

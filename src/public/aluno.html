@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
+  <title>Meu Projeto | Feira Técnica</title>
+  <link rel="stylesheet" href="css/student.css">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="student-area experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navegação da área do aluno">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área do aluno</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link active" href="aluno.html"><span class="ico">◇</span>Meu projeto</a>
+      <a class="nav-link" href="cracha-aluno.html"><span class="ico">▣</span>Meu crachá</a>
+      <a class="nav-link" href="index.html"><span class="ico">↗</span>Vitrine pública</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">★</span>Ranking</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Aluno</strong><span id="turmaPerfil">Equipe</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <div><h1>Meu projeto</h1><p>Informações exibidas na página pública da sua equipe.</p></div>
+      <div class="top-actions">
+        <span class="save-state saved" id="saveState">Carregando</span>
+        <a class="btn ghost sm" id="verPublicoTopo" href="index.html">Ver página</a>
+        <a class="btn sm" href="cracha-aluno.html">Crachá</a>
+      </div>
+    </header>
+
+    <main id="conteudo" class="student-main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">01 / CONSTRUIR · UNIVAP CENTRO</span><h2>Sua ideia tem <em>uma história.</em></h2><p>Conte o que motivou a equipe, mostre a solução e prepare a página que os visitantes vão conhecer.</p></div></section>
+      <div id="alerta" class="alert" role="status" aria-live="polite"></div>
+
+      <details class="student-card" id="segurancaConta" style="margin-bottom:24px;padding:20px">
+        <summary style="cursor:pointer;font-weight:700">Segurança da conta · Trocar senha</summary>
+        <p id="avisoSenhaTurma">Se você ainda usa a turma como senha, crie uma senha pessoal antes de editar seu projeto.</p>
+        <form id="formSenha" style="display:grid;gap:12px;max-width:460px">
+          <label for="senhaAtual">Senha atual</label><input id="senhaAtual" type="password" autocomplete="current-password" required>
+          <label for="novaSenha">Nova senha</label><input id="novaSenha" type="password" autocomplete="new-password" minlength="8" required aria-describedby="regraSenha">
+          <small id="regraSenha">Use ao menos 8 caracteres, com maiúscula, minúscula, número e símbolo.</small>
+          <button class="btn" type="submit">Salvar nova senha</button>
+          <p id="estadoSenha" role="status" aria-live="polite"></p>
+        </form>
+      </details>
+
+      <section id="semProjeto" class="student-card student-empty" hidden>
+        <h2>Projeto ainda não vinculado</h2>
+        <p>Quando a planilha oficial for importada, seu projeto aparecerá automaticamente aqui.</p>
+        <a class="btn ghost" href="index.html">Abrir vitrine</a>
+      </section>
+
+      <div id="areaProjeto" hidden>
+        <section class="project-summary">
+          <div class="project-summary-main">
+            <span class="project-kicker">Seu projeto</span>
+            <h2 id="heroTema">Carregando...</h2>
+            <p><span id="heroCurso">Curso</span> · <span id="heroEtapa">PLANEJAMENTO</span></p>
+          </div>
+          <div class="project-summary-stats">
+            <div><strong id="heroEquipe">—</strong><span id="heroTurmas">Equipe</span></div>
+            <div><strong id="heroCompletude">0%</strong><span>página preenchida</span></div>
+          </div>
+        </section>
+
+        <div class="student-workspace">
+          <form id="formProjeto" class="student-card project-editor" autocomplete="off">
+            <header class="student-card-header">
+              <div><h2>Editar página pública</h2><p>Preencha apenas o que o visitante precisa saber sobre o projeto.</p></div>
+              <span class="student-status" id="statusPill">Carregando</span>
+            </header>
+
+            <div class="official-note"><p>O cadastro da equipe já está pronto. Use este espaço para contar a história do projeto e mostrar o que vocês construíram.</p></div>
+            <section class="editor-block">
+              <h3>01 · Apresentação</h3>
+              <div class="student-form-grid">
+                <div class="student-field"><label for="statusProjeto">Etapa atual</label><select id="statusProjeto"><option>PLANEJAMENTO</option><option>EM DESENVOLVIMENTO</option><option>PRONTO PARA A FEIRA</option><option>FINALIZADO</option></select></div>
+                <div class="student-field full"><label for="descricao">Resumo</label><textarea id="descricao" placeholder="Explique o projeto em poucas linhas."></textarea></div>
+              </div>
+            </section>
+
+            <section class="editor-block">
+              <h3>02 · A ideia por trás do projeto</h3>
+              <div class="student-form-grid">
+                <div class="student-field"><label for="problema">Problema</label><textarea id="problema" placeholder="Qual problema motivou a ideia?"></textarea></div>
+                <div class="student-field"><label for="objetivo">Objetivo</label><textarea id="objetivo" placeholder="O que o projeto busca alcançar?"></textarea></div>
+                <div class="student-field"><label for="solucao">Solução</label><textarea id="solucao" placeholder="Como o projeto resolve esse problema?"></textarea></div>
+                <div class="student-field"><label for="diferencial">Diferencial</label><textarea id="diferencial" placeholder="O que diferencia o projeto?"></textarea></div>
+              </div>
+            </section>
+
+            <section class="editor-block">
+              <h3>03 · Como foi construído</h3>
+              <div class="student-form-grid">
+                <div class="student-field full"><label for="tecnologias">Tecnologias e materiais</label><input id="tecnologias" placeholder="HTML, Arduino, sensores..."></div>
+              </div>
+            </section>
+
+            <section class="editor-block">
+              <div class="editor-block-title"><h3>04 · Fotos do projeto</h3><span id="contadorGaleria">0 / 5</span></div>
+              <div class="student-field"><label for="fotos">Fotos do projeto</label><input id="fotos" type="file" accept="image/*" multiple><small>Até 5 imagens.</small></div>
+              <div id="previews" class="student-gallery"></div>
+            </section>
+
+            <details class="optional-block">
+              <summary>Links opcionais</summary>
+              <div class="student-form-grid optional-fields">
+                <div class="student-field"><label for="github">GitHub</label><input id="github" type="url" placeholder="https://github.com/..."></div>
+                <div class="student-field"><label for="video">Vídeo</label><input id="video" type="url" placeholder="https://youtube.com/..."></div>
+                <div class="student-field full"><label for="site">Site</label><input id="site" type="url" placeholder="https://..."></div>
+              </div>
+            </details>
+
+            <div class="editor-actions">
+              <a class="btn ghost" id="abrirPublico" href="index.html">Visualizar página</a>
+              <button class="btn success" type="submit">Salvar</button>
+            </div>
+          </form>
+
+          <aside class="student-side">
+            <section class="student-card side-compact">
+              <h3>Progresso</h3>
+              <div class="progress-row"><strong id="percentualPreenchimento">0%</strong><span id="completudeTexto">Em preenchimento</span></div>
+              <div class="student-progress"><span id="barraPreenchimento"></span></div>
+              <p id="progressNote">Complete as informações principais e adicione uma imagem.</p>
+            </section>
+
+            <section class="student-card side-compact" id="qrcode">
+              <div class="side-title"><h3>QR Code</h3><a id="baixarQr" download="qrcode-projeto.png">Baixar</a></div>
+              <div class="student-qr"><img id="qrImg" alt="QR Code do projeto"><span id="qrLoading">Gerando...</span></div>
+              <a class="btn ghost" id="abrirQrPagina" target="_blank" rel="noopener">Abrir página</a>
+              <code id="qrUrl" class="student-url"></code>
+            </section>
+
+            <section class="student-card side-compact">
+              <h3>Sua equipe</h3>
+              <div id="equipeOficial" class="student-team"></div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav" aria-label="Navegação rápida">
+  <a class="active" href="aluno.html"><strong>◇</strong><span>Projeto</span></a>
+  <a href="cracha-aluno.html"><strong>▣</strong><span>Crachá</span></a>
+  <a href="index.html"><strong>↗</strong><span>Vitrine</span></a>
+  <a href="ranking.html"><strong>★</strong><span>Ranking</span></a>
+</nav>
+
+<script src="js/auth.js"></script>
+<script>
+if(SESSAO.role!=='ALUNO') location.replace('dashboard.html');
+const $=id=>document.getElementById(id);
+const alerta=$('alerta');
+const rt=value=>window.repararTexto?window.repararTexto(value):String(value??'');
+const esc=value=>window.escapeHtml?window.escapeHtml(value):String(value??'');
+let projetoAtual=null, imagens=[], dirty=false;
+
+if(SESSAO.usuario.deveTrocarSenha){$('segurancaConta').open=true;$('avisoSenhaTurma').textContent='Sua senha inicial é a turma e pode ser conhecida por outras pessoas. Troque-a agora por uma senha pessoal.'}
+$('formSenha').addEventListener('submit',async e=>{
+  e.preventDefault();const button=e.currentTarget.querySelector('button');button.disabled=true;$('estadoSenha').textContent='Salvando...';
+  try{
+    await api('/api/v1/alunos/me/senha',{method:'PUT',body:JSON.stringify({senhaAtual:$('senhaAtual').value,novaSenha:$('novaSenha').value})});
+    e.currentTarget.reset();SESSAO.usuario.deveTrocarSenha=false;$('avisoSenhaTurma').textContent='Sua senha pessoal está ativa.';$('estadoSenha').textContent='Senha alterada com sucesso.';
+  }catch(error){$('estadoSenha').textContent=error.message||'Não foi possível trocar a senha.'}finally{button.disabled=false}
+});
+
+$('turmaPerfil').textContent=[SESSAO.usuario.turma,SESSAO.usuario.curso].filter(Boolean).map(rt).join(' · ')||'Aluno';
+
+function setDirty(value){
+  dirty=Boolean(value);
+  const el=$('saveState');
+  el.textContent=dirty?'Não salvo':'Tudo salvo';
+  el.className=`save-state ${dirty?'pending':'saved'}`;
+}
+
+async function comprimir(file){
+  return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const img=new Image();img.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',.78))};img.onerror=reject;img.src=reader.result};reader.readAsDataURL(file)});
+}
+
+function dadosForm(){return {statusProjeto:$('statusProjeto').value,descricao:$('descricao').value.trim(),objetivo:$('objetivo').value.trim(),problema:$('problema').value.trim(),solucao:$('solucao').value.trim(),diferencial:$('diferencial').value.trim(),tecnologias:$('tecnologias').value.split(',').map(x=>x.trim()).filter(Boolean),imagens,links:{github:$('github').value.trim(),video:$('video').value.trim(),site:$('site').value.trim()}}}
+
+function atualizarProgresso(){
+  const d=dadosForm();
+  const checks=[d.descricao,d.problema,d.objetivo,d.solucao,d.diferencial,d.tecnologias.length,imagens.length];
+  const pct=Math.round(checks.filter(Boolean).length/checks.length*100);
+  $('heroCompletude').textContent=`${pct}%`;
+  $('percentualPreenchimento').textContent=`${pct}%`;
+  $('barraPreenchimento').style.width=`${pct}%`;
+  $('completudeTexto').textContent=pct===100?'Página completa':pct>=80?'Quase pronto':pct>=50?'Em andamento':'Em preenchimento';
+  $('progressNote').textContent=pct>=80?'Revise o texto e as imagens antes da feira.':'Complete os campos principais e adicione pelo menos uma imagem.';
+}
+
+function renderImgs(){
+  $('contadorGaleria').textContent=`${imagens.length} / 5`;
+  $('previews').innerHTML=imagens.map((src,i)=>`<article class="student-shot"><img src="${esc(src)}" alt="Foto ${i+1}"><button type="button" class="btn danger sm" data-img="${i}">Remover</button></article>`).join('');
+  $('previews').querySelectorAll('[data-img]').forEach(btn=>btn.onclick=()=>{imagens.splice(Number(btn.dataset.img),1);setDirty(true);renderImgs()});
+  atualizarProgresso();
+}
+
+$('fotos').addEventListener('change',async e=>{const files=[...e.target.files].slice(0,Math.max(0,5-imagens.length));for(const file of files)if(file.type.startsWith('image/'))imagens.push(await comprimir(file));setDirty(true);renderImgs();e.target.value=''});
+
+function preencher(p){
+  projetoAtual=p; imagens=[...(p.imagens||[])];
+  $('statusProjeto').value=rt(p.statusProjeto||'PLANEJAMENTO'); $('descricao').value=rt(p.descricao||''); $('objetivo').value=rt(p.objetivo||''); $('problema').value=rt(p.problema||''); $('solucao').value=rt(p.solucao||''); $('diferencial').value=rt(p.diferencial||''); $('tecnologias').value=(p.tecnologias||[]).map(rt).join(', '); $('github').value=p.links?.github||''; $('video').value=p.links?.video||''; $('site').value=p.links?.site||'';
+  $('heroTema').textContent=rt(p.tema||'Projeto'); $('heroCurso').textContent=rt(p.curso||'Curso'); $('heroEtapa').textContent=rt(p.statusProjeto||'PLANEJAMENTO'); $('statusPill').textContent=rt(p.statusProjeto||'PLANEJAMENTO');
+  const pessoas=[p.representante,...(p.integrantes||[])].filter(Boolean); const turmas=[...new Set(pessoas.map(x=>rt(x.turma)).filter(Boolean))].join(' · ')||'Equipe';
+  $('heroEquipe').textContent=`${pessoas.length} ${pessoas.length===1?'integrante':'integrantes'}`; $('heroTurmas').textContent=turmas;
+  $('equipeOficial').innerHTML=pessoas.map((x,i)=>`<article><span class="student-avatar">${esc(rt(x.nome||'?').charAt(0).toUpperCase())}</span><div><strong>${esc(rt(x.nome||'Aluno'))}</strong><small>${i===0?'Representante':'Integrante'} · ${esc(rt(x.turma||'Turma'))}</small></div></article>`).join('');
+  const publico=`projeto.html?id=${encodeURIComponent(p.id)}`; $('abrirPublico').href=publico; $('verPublicoTopo').href=publico;
+  renderImgs(); setDirty(false);
+}
+
+async function salvar(){
+  if($('formProjeto').getAttribute('aria-busy')==='true')return;
+  if(!projetoAtual)return mostrarAlerta(alerta,'error','Projeto ainda não vinculado.');
+  const button=$('formProjeto').querySelector('button[type=submit]');button.disabled=true;$('formProjeto').setAttribute('aria-busy','true');
+  try{limparAlerta(alerta);$('saveState').textContent='Salvando...';const r=await api(`/api/v1/projetos/${encodeURIComponent(projetoAtual.id)}`,{method:'PUT',body:JSON.stringify({projeto:dadosForm()})});preencher(r.data.projeto);mostrarAlerta(alerta,'ok','Projeto salvo com sucesso.')}catch(e){setDirty(true);mostrarAlerta(alerta,'error',e.message)}finally{button.disabled=false;$('formProjeto').removeAttribute('aria-busy')}
+}
+$('formProjeto').onsubmit=e=>{e.preventDefault();salvar()};
+
+async function carregarQr(){try{const r=await api('/api/v1/projetos/meu/qrcode'),q=r.data;$('qrImg').src=q.qrCode;$('qrImg').style.display='block';$('qrLoading').style.display='none';$('abrirQrPagina').href=q.urlPublica;$('baixarQr').href=q.qrCode;$('qrUrl').textContent=q.urlPublica}catch(error){$('qrLoading').textContent=error.message||'QR Code indisponível'}}
+async function carregar(){try{const r=await api('/api/v1/projetos/meu'),p=r.data.projeto;if(!p){$('semProjeto').hidden=false;$('areaProjeto').hidden=true;return}$('semProjeto').hidden=true;$('areaProjeto').hidden=false;preencher(p);await carregarQr()}catch(e){mostrarAlerta(alerta,'error',e.message)}}
+
+['statusProjeto','descricao','objetivo','problema','solucao','diferencial','tecnologias','github','video','site'].forEach(id=>{const el=$(id);const change=()=>{setDirty(true);atualizarProgresso();if(id==='statusProjeto'){$('heroEtapa').textContent=el.value;$('statusPill').textContent=el.value}};el.addEventListener('input',change);el.addEventListener('change',change)});
+window.addEventListener('beforeunload',e=>{if(!dirty)return;e.preventDefault();e.returnValue='' });
+carregar();
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

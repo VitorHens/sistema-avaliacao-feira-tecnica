@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Votação do público | Feira Técnica 2026</title>
+  <link rel="icon" type="image/png" href="imagens/logo.png">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/site-brand.css">
+  <link rel="stylesheet" href="css/visual-system.css">
+  <style>
+    .settings-wrap{max-width:820px;margin:clamp(30px,6vw,70px) auto;padding:0 20px 70px}
+    .settings-wrap h1{font-size:clamp(2rem,5vw,3.3rem);margin:12px 0 10px}
+    .settings-wrap>p{max-width:65ch;line-height:1.7}
+    .settings-card{background:#fff;border:1px solid #d9e0e8;border-radius:18px;padding:clamp(22px,4vw,36px);margin:28px 0;box-shadow:0 18px 45px #102a470d}
+    .settings-card h2{margin:0 0 14px}
+    .settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:18px 0}
+    .settings-card label{display:grid;gap:8px;font-weight:650;color:#102b4a}
+    .settings-card input{min-height:46px;padding:9px 12px;border:1px solid #9aabc0;border-radius:9px;background:#fff;color:#102b4a;font:inherit}
+    .settings-card input:focus-visible,.settings-card button:focus-visible{outline:3px solid #eab86f;outline-offset:2px}
+    .settings-card .periodo{padding:15px;border:1px solid #d9e0e8;border-radius:10px;margin:12px 0}
+    .settings-card .check{display:flex;align-items:flex-start;gap:11px;font-weight:500;line-height:1.5}
+    .settings-card .check input{min-height:auto;margin-top:5px}
+    .settings-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:22px}
+    .settings-actions button{background:#0b3970;color:white;border:0;padding:13px 21px;border-radius:9px;font:inherit;font-weight:700;cursor:pointer}
+    .settings-actions button:hover{background:#145493}
+    .settings-card small{display:block;line-height:1.6;color:#465a72}
+    .settings-status{min-height:28px;margin-top:15px;font-weight:650}
+    @media(max-width:600px){.settings-grid{grid-template-columns:1fr 1fr}.topo-inner{flex-wrap:wrap}.settings-card{padding:20px}}
+  </style>
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<header class="topo"><div class="container topo-inner"><a class="marca" href="dashboard.html"><img src="imagens/logo.png" alt="Colégios Univap"><div>Feira Técnica<small>Administração da votação</small></div></a><nav class="nav"><a class="botao secundario" href="dashboard.html">Voltar ao painel</a><a class="botao secundario" href="ranking-visitantes.html">Ver ranking</a></nav></div></header>
+<main class="settings-wrap" id="conteudo">
+  <span class="selo">Organização da feira</span>
+  <h1>Votação do público</h1>
+  <p>Defina quando os visitantes podem avaliar os projetos. O ranking continua visível quando a votação estiver fechada.</p>
+  <form id="configForm" class="settings-card">
+    <h2>Data e períodos</h2>
+    <label for="data">Data da feira<input id="data" name="data" type="date" required></label>
+    <div class="periodo"><strong>Primeiro período</strong><div class="settings-grid"><label>Início<input id="inicio1" type="time" required></label><label>Fim<input id="fim1" type="time" required></label></div></div>
+    <div class="periodo"><strong>Segundo período (opcional)</strong><div class="settings-grid"><label>Início<input id="inicio2" type="time"></label><label>Fim<input id="fim2" type="time"></label></div></div>
+    <label class="check"><input id="exigirCodigo" type="checkbox">Exigir código individual de visitante para avaliar</label>
+    <small>Ative antes da primeira avaliação. Um código permite uma nota por projeto, mesmo que o visitante use outro navegador. Entregue um código diferente para cada pessoa.</small>
+    <div class="settings-actions"><button type="submit">Salvar configuração</button></div>
+    <p id="status" class="settings-status" role="status" aria-live="polite"></p>
+  </form>
+  <section class="settings-card" aria-labelledby="codigosTitulo">
+    <h2 id="codigosTitulo">Códigos de visitantes</h2>
+    <p id="totalCodigos">Carregando quantidade de códigos...</p>
+    <small>Baixe os códigos e guarde o arquivo em local privado. O sistema armazena apenas a impressão digital de cada código; a lista aparece uma única vez na geração.</small>
+    <div class="settings-actions"><label for="quantidade">Quantidade<input id="quantidade" type="number" min="1" max="1000" value="100"></label><button id="gerar" type="button">Gerar e baixar códigos</button></div>
+    <p id="statusCodigos" class="settings-status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+<script src="js/auth.js"></script>
+<script>
+(() => {
+  if (!window.SESSAO || SESSAO.role !== 'ADMINISTRADOR') { location.replace('dashboard.html'); return; }
+  const $ = id => document.getElementById(id);
+  async function carregar() {
+    try {
+      const data = (await api('api/v1/configuracao-votacao')).data;
+      $('data').value = data.data;
+      $('inicio1').value = data.periodos[0]?.inicio || '';
+      $('fim1').value = data.periodos[0]?.fim || '';
+      $('inicio2').value = data.periodos[1]?.inicio || '';
+      $('fim2').value = data.periodos[1]?.fim || '';
+      $('exigirCodigo').checked = data.exigirCodigo;
+      $('totalCodigos').textContent = `${data.codigosGerados} códigos gerados.`;
+    } catch (error) { $('status').textContent = error.message; }
+  }
+  $('configForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const periodos = [{ inicio: $('inicio1').value, fim: $('fim1').value }];
+    if ($('inicio2').value || $('fim2').value) periodos.push({ inicio: $('inicio2').value, fim: $('fim2').value });
+    try {
+      await api('api/v1/configuracao-votacao', { method: 'PUT', body: JSON.stringify({ data: $('data').value, periodos, exigirCodigo: $('exigirCodigo').checked }) });
+      $('status').textContent = 'Configuração salva. Os visitantes verão o novo horário imediatamente.';
+    } catch (error) { $('status').textContent = error.message; }
+  });
+  $('gerar').addEventListener('click', async () => {
+    try {
+      const quantidade = Number($('quantidade').value);
+      const result = await api('api/v1/configuracao-votacao/codigos', { method: 'POST', body: JSON.stringify({ quantidade }) });
+      const csv = 'codigo\r\n' + result.data.codigos.join('\r\n') + '\r\n';
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob(['\ufeff', csv], { type: 'text/csv;charset=utf-8' }));
+      link.download = `codigos-visitantes-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 60000);
+      $('statusCodigos').textContent = `${result.data.codigos.length} códigos gerados. Guarde o arquivo baixado.`;
+      await carregar();
+    } catch (error) { $('statusCodigos').textContent = error.message; }
+  });
+  carregar();
+})();
+</script>
+</body>
+</html>

@@ -1,240 +1,83 @@
 const { ObjectId } = require("mongodb");
-const logger = require("../utils/Logger");
 
 module.exports = class ProjetoDAOMongo {
     #database;
 
     constructor(databaseInstance) {
-        logger.info("⬆️ ProjetoDAOMongo.constructor()");
         this.#database = databaseInstance;
     }
 
-    async create(objProjetoModel) {
-        const method = "ProjetoDAOMongo.create";
-
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const documento = this.#modelToDocument(objProjetoModel);
-            const resultado = await collection.insertOne(documento);
-
-            if (!resultado.insertedId) {
-                throw new Error("Falha ao inserir projeto.");
-            }
-
-            const idProjeto = resultado.insertedId.toString();
-
-            logger.info(`✅ ${method} - Projeto criado`, {
-                idProjeto
-            });
-
-            return idProjeto;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao criar projeto`, {
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+    async create(projeto) {
+        const collection = await this.#database.getCollection("projetos");
+        const result = await collection.insertOne(this.#modelToDocument(projeto));
+        if (!result.insertedId) throw new Error("Falha ao inserir projeto.");
+        return result.insertedId.toString();
     }
 
-    async update(objProjetoModel) {
-        const method = "ProjetoDAOMongo.update";
+    async update(projeto) {
+        const collection = await this.#database.getCollection("projetos");
+        const document = this.#modelToDocument(projeto);
+        delete document.dataCadastro;
+        document.dataAtualizacao = new Date();
 
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const filtro = {
-                _id: new ObjectId(objProjetoModel.id)
-            };
-
-            const documento = this.#modelToDocument(objProjetoModel);
-
-            // Não altera a data original do cadastro.
-            delete documento.dataCadastro;
-
-            documento.dataAtualizacao = new Date();
-
-            const resultado = await collection.updateOne(filtro, {
-                $set: documento
-            });
-
-            return resultado.matchedCount > 0;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao atualizar projeto`, {
-                idProjeto: objProjetoModel?.id,
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+        const result = await collection.updateOne(
+            { _id: new ObjectId(projeto.id) },
+            { $set: document }
+        );
+        return result.matchedCount > 0;
     }
 
-    async delete(objProjetoModel) {
-        const method = "ProjetoDAOMongo.delete";
-
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const resultado = await collection.deleteOne({
-                _id: new ObjectId(objProjetoModel.id)
-            });
-
-            return resultado.deletedCount > 0;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao excluir projeto`, {
-                idProjeto: objProjetoModel?.id,
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+    async delete(projeto) {
+        const collection = await this.#database.getCollection("projetos");
+        const result = await collection.deleteOne({ _id: new ObjectId(projeto.id) });
+        return result.deletedCount > 0;
     }
 
     async findAll() {
-        const method = "ProjetoDAOMongo.findAll";
-
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const documentos = await collection
-                .find()
-                .sort({ dataCadastro: -1 })
-                .toArray();
-
-            return documentos.map(documento =>
-                this.#documentToObject(documento)
-            );
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao listar projetos`, {
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+        const collection = await this.#database.getCollection("projetos");
+        const documents = await collection.find().sort({ dataCadastro: -1 }).toArray();
+        return documents.map(document => this.#documentToObject(document));
     }
 
-    async findById(idProjeto) {
-        const method = "ProjetoDAOMongo.findById";
-
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const documento = await collection.findOne({
-                _id: new ObjectId(idProjeto)
-            });
-
-            if (!documento) {
-                return null;
-            }
-
-            return this.#documentToObject(documento);
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao buscar projeto`, {
-                idProjeto,
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+    async findById(id) {
+        if (!ObjectId.isValid(id)) return null;
+        const collection = await this.#database.getCollection("projetos");
+        const document = await collection.findOne({ _id: new ObjectId(id) });
+        return document ? this.#documentToObject(document) : null;
     }
 
-    /**
-     * Salva o QR Code (base64) e a URL pública gerados para o projeto.
-     * Chamado logo após a criação do projeto, quando o id já existe.
-     */
-    async salvarQrCode(idProjeto, qrCodeBase64, urlPublica) {
-        const method = "ProjetoDAOMongo.salvarQrCode";
+    async findByAlunoId(alunoId, matricula = null) {
+        const collection = await this.#database.getCollection("projetos");
+        const conditions = [{ alunoId: String(alunoId) }];
 
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const resultado = await collection.updateOne(
-                { _id: new ObjectId(idProjeto) },
-                { $set: { qrCode: qrCodeBase64, urlPublica } }
-            );
-
-            return resultado.matchedCount > 0;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao salvar QR Code`, {
-                idProjeto,
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
-    }
-
-    async findByField(field, value) {
-        const method = "ProjetoDAOMongo.findByField";
-
-        const camposPermitidos = [
-            "id",
-            "tema",
-            "curso",
-            "equipamento",
-            "representante.matricula"
-        ];
-
-        if (!camposPermitidos.includes(field)) {
-            throw new Error(`Campo inválido para busca: ${field}`);
+        if (matricula) {
+            conditions.push({ "representante.matricula": String(matricula) });
+            conditions.push({ "integrantes.matricula": String(matricula) });
         }
 
-        try {
-            const collection = await this.#database.getCollection("projetos");
-
-            const filtro = field === "id"
-                ? { _id: new ObjectId(value) }
-                : { [field]: value };
-
-            const documentos = await collection.find(filtro).toArray();
-
-            return documentos.map(documento =>
-                this.#documentToObject(documento)
-            );
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao buscar projetos`, {
-                field,
-                value,
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+        const document = await collection.findOne({ $or: [
+            { alunosAutorizados: String(alunoId) },
+            { alunosAutorizados: { $exists: false }, $or: conditions },
+        ] });
+        return document ? this.#documentToObject(document) : null;
     }
 
     async findByMatricula(matricula) {
-        const method = "ProjetoDAOMongo.findByMatricula";
+        const collection = await this.#database.getCollection("projetos");
+        const documents = await collection.find({
+            $or: [
+                { "representante.matricula": matricula },
+                { "integrantes.matricula": matricula },
+            ],
+        }).toArray();
 
-        try {
-            const collection = await this.#database.getCollection("projetos");
+        return documents.map(document => this.#documentToObject(document));
+    }
 
-            const documentos = await collection.find({
-                $or: [
-                    { "representante.matricula": matricula },
-                    { "integrantes.matricula": matricula }
-                ]
-            }).toArray();
-
-            return documentos.map(documento =>
-                this.#documentToObject(documento)
-            );
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao buscar matrícula`, {
-                matricula,
-                error: error.message,
-                stack: error.stack
-            });
-
-            throw error;
-        }
+    async updatePresentation(id, values) {
+        const collection = await this.#database.getCollection('projetos');
+        const result = await collection.updateOne({_id:new ObjectId(id)},{$set:{...values,dataAtualizacao:new Date()}});
+        return result.matchedCount > 0;
     }
 
     #modelToDocument(projeto) {
@@ -246,24 +89,45 @@ module.exports = class ProjetoDAOMongo {
             equipamento: projeto.equipamento,
             outrosRecursos: projeto.outrosRecursos,
             observacoes: projeto.observacoes,
-            dataCadastro: projeto.dataCadastro || new Date()
+            alunoId: projeto.alunoId,
+            descricao: projeto.descricao,
+            objetivo: projeto.objetivo,
+            problema: projeto.problema,
+            solucao: projeto.solucao,
+            diferencial: projeto.diferencial,
+            tecnologias: projeto.tecnologias,
+            imagens: projeto.imagens,
+            links: projeto.links,
+            localizacao: projeto.localizacao,
+            statusProjeto: projeto.statusProjeto,
+            dataCadastro: projeto.dataCadastro || new Date(),
         };
     }
 
-    #documentToObject(documento) {
+    #documentToObject(document) {
         return {
-            id: documento._id.toString(),
-            tema: documento.tema,
-            curso: documento.curso,
-            representante: documento.representante,
-            integrantes: documento.integrantes || [],
-            equipamento: documento.equipamento,
-            outrosRecursos: documento.outrosRecursos || null,
-            observacoes: documento.observacoes || null,
-            dataCadastro: documento.dataCadastro,
-            dataAtualizacao: documento.dataAtualizacao || null,
-            qrCode: documento.qrCode || null,
-            urlPublica: documento.urlPublica || null
+            id: document._id.toString(),
+            tema: document.tema,
+            curso: document.curso,
+            representante: document.representante,
+            integrantes: document.integrantes || [],
+            equipamento: document.equipamento,
+            outrosRecursos: document.outrosRecursos || null,
+            observacoes: document.observacoes || null,
+            alunoId: document.alunoId || null,
+            ...(Array.isArray(document.alunosAutorizados) ? {alunosAutorizados:document.alunosAutorizados} : {}),
+            dataCadastro: document.dataCadastro,
+            dataAtualizacao: document.dataAtualizacao || null,
+            descricao: document.descricao || null,
+            objetivo: document.objetivo || null,
+            problema: document.problema || null,
+            solucao: document.solucao || null,
+            diferencial: document.diferencial || null,
+            tecnologias: document.tecnologias || [],
+            imagens: document.imagens || [],
+            links: document.links || {},
+            localizacao: document.localizacao || null,
+            statusProjeto: document.statusProjeto || "PLANEJAMENTO",
         };
     }
 };

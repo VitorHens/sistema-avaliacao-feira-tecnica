@@ -1,0 +1,43 @@
+/* Páginas de projeto, aluno e equipe: toque, leitura e navegação em telas pequenas. */
+@media(max-width:1000px){
+  .experience .content>.topbar,.experience .topo{position:sticky;top:0;z-index:70}
+  .experience .ui-menu-toggle{min-width:44px;min-height:44px;flex:none}
+  .experience .sidebar{height:100dvh;padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+  .experience .main,.experience .student-main,.experience .evaluator-main,.experience .badge-main{scroll-margin-top:90px}
+}
+@media(max-width:700px){
+  .experience{overflow-x:clip}
+  .experience .content>.topbar,.experience .topo{position:static}
+  .experience .content{min-width:0}
+  .experience .content>.topbar{box-sizing:border-box;min-height:68px;padding:12px 16px;background:#fff;box-shadow:0 2px 12px #101f3210}
+  .experience .content>.topbar h1{font-size:20px;line-height:1.25;margin:0}
+  .experience .content>.topbar p{font-size:12px;line-height:1.4;margin:3px 0 0}
+  .experience .top-actions{display:flex;gap:8px;overflow-x:auto;max-width:100%;padding-bottom:2px;scrollbar-width:thin}
+  .experience .top-actions>.btn,.experience .top-actions>button{min-height:44px;white-space:nowrap;flex:none}
+  .experience .main,.experience .student-main,.experience .evaluator-main,.experience .badge-main{box-sizing:border-box;width:100%;max-width:none;padding-inline:16px}
+  .experience .workspace-story{padding:22px 20px;margin-bottom:18px}
+  .experience .workspace-story h2{font-size:clamp(24px,7vw,32px);line-height:1.15}
+  .experience .workspace-story p{font-size:13px}
+  .experience .student-card,.experience .eval-panel,.experience .eval-section,.experience .block,.experience .card{min-width:0}
+  .experience .editor-actions>.btn,.experience .qr-actions>.btn,.experience .qr-actions>button{min-height:46px}
+  .experience .qr-controls .toolbar{display:grid;grid-template-columns:1fr;gap:12px}
+  .experience .qr-controls .toolbar .field,.experience .qr-controls .toolbar .btn{width:100%;min-width:0}
+  .experience .qr-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .experience .qr-actions>*{min-width:0;text-align:center}
+  .experience .topo-inner{padding-block:9px;gap:8px}
+  .experience .topo .nav{display:flex;flex-wrap:nowrap;overflow-x:auto;max-width:100%;gap:8px;padding-bottom:4px;scrollbar-width:thin}
+  .experience .topo .botao{min-height:44px;white-space:nowrap}
+  .experience .detail-hero,.experience .ranking-hero{padding:30px 0 38px}
+  .experience .detail-hero h1,.experience .ranking-hero h1{font-size:clamp(32px,8vw,46px);line-height:1.1;overflow-wrap:anywhere}
+  .experience .mobile-nav a{min-height:48px;justify-content:center}
+  .experience .mobile-nav{padding-bottom:max(10px,env(safe-area-inset-bottom))}
+  .experience .footer{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .experience input:not([type=checkbox]):not([type=radio]),.experience select,.experience textarea{font-size:16px}
+}
+@media(max-width:360px){
+  .experience .qr-actions{grid-template-columns:1fr}
+  .experience .topbar .top-actions{width:100%}
+}
+@media print{
+  .experience .content>.topbar,.experience .topo{position:static}
+}

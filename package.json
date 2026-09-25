@@ -1,25 +1,27 @@
 {
-  "name": "api_js_funcionario_cargo",
+  "name": "sistema-avaliacao-feira-tecnica",
   "version": "1.0.0",
   "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "start:teste-acessos": "node tools/start-test-accounts.cjs",
+    "start:teste-professor": "node tools/start-test-accounts.cjs",
+    "test": "node --test tests/*.test.js"
   },
   "author": "Hélio Lourenço Esperidião Ferreira",
+  "contributors": ["Vitor Hens"],
   "license": "ISC",
-  "description": "Sistema web para cadastro e avaliação de projetos de feira técnica com Node.js, MongoDB e JWT",
+  "description": "Sistema em desenvolvimento para gerenciar projetos e avaliações da Feira Técnica da Univap",
+  "repository": "https://github.com/VitorHens/sistema-avaliacao-feira-tecnica",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^7.6.0",
-    "mysql2": "^3.24.4",
     "qrcode": "^1.5.4",
     "winston": "^3.19.0"
   },

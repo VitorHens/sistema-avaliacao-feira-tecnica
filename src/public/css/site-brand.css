@@ -1,0 +1,17 @@
+/* Marca da feira e assinatura institucional preservada. */
+.site-symbol{display:inline-grid;place-items:center;flex:none;color:#dfc99f;font-family:'Segoe UI Symbol','Segoe UI',sans-serif;font-weight:400;font-size:49px;line-height:1;letter-spacing:0;width:52px;height:56px;text-shadow:none}
+.story-site .brand,.experience .marca{gap:16px}
+.story-site .brand img,.experience .marca img{width:142px;height:65px;max-height:none;object-fit:contain;background:#fff;padding:8px;border-radius:6px;box-shadow:0 3px 15px #00000015;flex-shrink:0}
+.story-site .site-header{min-height:98px;height:auto;padding-top:12px;padding-bottom:12px}
+.experience .sidebar .brand{position:relative;gap:14px;align-items:flex-start}
+.experience .sidebar .brand .site-symbol{position:absolute;right:0;bottom:21px;width:34px;height:36px;font-size:34px}
+.experience .sidebar .brand img{width:190px;height:82px;max-width:100%;padding:10px;background:white;object-fit:contain;border-radius:7px}
+.experience.login-centered .login-brand{flex-wrap:wrap;gap:15px;justify-content:center}
+.experience.login-centered .login-brand img{width:174px;height:78px;object-fit:contain;padding:9px;background:#fff;border-radius:7px}
+.experience.login-centered .login-brand .site-symbol{color:#dfc99f;font-size:54px;width:54px;height:60px}
+.badge-page .print-badge .badge-logo{top:5%;width:88%;height:20%;padding:1%}
+.badge-page .badge-event{top:26%}
+.experience .stand-face>img:first-child{width:200px;max-width:80%;background:white;padding:7px}
+@media(max-width:850px){.story-site .brand>span:not(.site-symbol){display:none}.story-site .brand{gap:10px}.story-site .brand img,.experience .marca img{width:125px;height:58px}.site-symbol{font-size:39px;width:40px;height:48px}}
+@media(max-width:560px){.story-site .site-header{flex-wrap:wrap;gap:12px;justify-content:space-between}.story-site .site-header .brand{gap:9px}.story-site .site-header nav{order:3;width:100%;justify-content:center;border-top:1px solid #ffffff20;padding-top:10px}.story-site .site-header nav a:first-child,.story-site .site-header nav a[href='ranking.html']{display:inline}.story-site .site-header .brand img{width:135px;height:59px}.experience .marca{gap:10px;flex-wrap:wrap}.experience .marca img{width:135px;height:62px}.experience .marca>div{font-size:12px}.experience.login-centered .login-brand img{width:155px;height:72px}.experience.login-centered .login-brand>div{width:100%;text-align:center}.experience.login-centered .login-brand .site-symbol{font-size:45px;width:46px}.story-site .site-footer .brand img{width:125px;height:58px}}
+@media print{.badge-page .print-badge .badge-logo{top:5%!important;width:88%!important;height:20%!important}.experience .stand-face>img:first-child{width:45mm;padding:0}}

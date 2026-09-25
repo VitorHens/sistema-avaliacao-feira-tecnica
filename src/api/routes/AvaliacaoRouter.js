@@ -1,59 +1,55 @@
 const express = require('express');
-const logger = require('../utils/Logger');
 
 module.exports = class AvaliacaoRouter {
-    #router;
+    #router = express.Router();
     #jwtMiddleware;
     #avaliacaoMiddleware;
     #avaliacaoController;
 
-    constructor(jwtMiddlewareDependency, avaliacaoMiddlewareDependency, avaliacaoControllerDependency) {
-        logger.info('⬆️ AvaliacaoRouter.constructor()');
-        this.#router = express.Router();
-        this.#jwtMiddleware = jwtMiddlewareDependency;
-        this.#avaliacaoMiddleware = avaliacaoMiddlewareDependency;
-        this.#avaliacaoController = avaliacaoControllerDependency;
+    constructor(jwtMiddleware, avaliacaoMiddleware, avaliacaoController) {
+        this.#jwtMiddleware = jwtMiddleware;
+        this.#avaliacaoMiddleware = avaliacaoMiddleware;
+        this.#avaliacaoController = avaliacaoController;
     }
 
     createRoutes = () => {
-        const method = 'AvaliacaoRouter.createRoutes';
-        logger.info(`⬆️ ${method} - Configurando rotas de Avaliação`);
+        const autenticado = this.#jwtMiddleware.validateToken;
+        const avaliador = this.#jwtMiddleware.permitirRoles('ADMINISTRADOR', 'AVALIADOR');
+        const administrador = this.#jwtMiddleware.permitirRoles('ADMINISTRADOR');
 
-        this.#router.post('/',
-            this.#jwtMiddleware.validateToken,
-            this.#avaliacaoMiddleware.validateBody,
-            this.#avaliacaoController.store
-        );
-        this.#router.get('/',
-            this.#jwtMiddleware.validateToken,
-            this.#avaliacaoController.index
-        );
-        this.#router.get('/projeto/:idProjeto',
-            this.#jwtMiddleware.validateToken,
+        this.#router.get('/ranking/publico', this.#avaliacaoController.rankingPublico);
+        this.#router.post('/', autenticado, avaliador, this.#avaliacaoMiddleware.validateBody, this.#avaliacaoController.store);
+        this.#router.get('/', autenticado, avaliador, this.#avaliacaoController.index);
+        this.#router.get(
+            '/projeto/:idProjeto',
+            autenticado,
+            avaliador,
             this.#avaliacaoMiddleware.validateProjetoIdParam,
             this.#avaliacaoController.indexByProjeto
         );
-        this.#router.get('/:idAvaliacao',
-            this.#jwtMiddleware.validateToken,
+        this.#router.get(
+            '/:idAvaliacao',
+            autenticado,
+            avaliador,
             this.#avaliacaoMiddleware.validateIdParam,
             this.#avaliacaoController.show
         );
-        this.#router.put('/:idAvaliacao',
-            this.#jwtMiddleware.validateToken,
+        this.#router.put(
+            '/:idAvaliacao',
+            autenticado,
+            avaliador,
             this.#avaliacaoMiddleware.validateIdParam,
             this.#avaliacaoMiddleware.validateBody,
             this.#avaliacaoController.update
         );
-        this.#router.delete('/:idAvaliacao',
-            this.#jwtMiddleware.validateToken,
+        this.#router.delete(
+            '/:idAvaliacao',
+            autenticado,
+            administrador,
             this.#avaliacaoMiddleware.validateIdParam,
             this.#avaliacaoController.destroy
         );
 
-        logger.info(`✅ ${method} - Rotas de Avaliação configuradas`, {
-            basePath: '/api/v1/avaliacoes',
-            totalRoutes: 6,
-        });
         return this.#router;
     };
 };

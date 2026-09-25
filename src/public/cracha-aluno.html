@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
+  <title>Meu Crachá | Feira Técnica</title>
+  <link rel="stylesheet" href="css/student.css">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="stylesheet" href="css/badge-refine.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+<link rel="stylesheet" href="css/badge-reference.css">
+</head>
+<body class="student-area badge-page experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navegação da área do aluno">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área do aluno</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link" href="aluno.html"><span class="ico">◇</span>Meu projeto</a>
+      <a class="nav-link active" href="cracha-aluno.html"><span class="ico">▣</span>Meu crachá</a>
+      <a class="nav-link" href="index.html"><span class="ico">↗</span>Vitrine pública</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">★</span>Ranking</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Aluno</strong><span id="turmaPerfil">Equipe</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <div><h1>Meu crachá</h1><p>Prepare a identificação dos participantes com espaço para recorte.</p></div>
+      <div class="top-actions"><a class="btn ghost sm" href="aluno.html">Voltar ao projeto</a></div>
+    </header>
+
+    <main id="conteudo" class="badge-main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">04 / ENCONTRAR · UNIVAP CENTRO</span><h2>Uma ideia. <em>Um rosto.</em></h2><p>Prepare a identificação de cada integrante e confira a prévia antes de imprimir.</p></div></section>
+      <div class="badge-layout-clean">
+        <aside class="badge-config-clean student-card">
+          <header class="student-card-header"><div><h2>Configuração</h2><p>Selecione um participante da equipe e adicione sua foto. O nome vem do cadastro oficial.</p></div><span class="badge-size">95 × 138,5 mm</span></header>
+
+          <label class="badge-toggle-clean"><div><strong>Segundo crachá</strong><span>Imprimir também o crachá de um colega.</span></div><input type="checkbox" id="ativarSegundo"></label>
+
+          <section class="badge-person-clean" data-slot="0">
+            <h3>Crachá principal</h3>
+            <div class="badge-form-grid">
+              <div class="student-field full"><label for="pessoa0">Participante</label><select id="pessoa0"></select></div>
+              <div class="student-field"><label for="funcao0">Função</label><select id="funcao0"><option>Expositor</option><option>Capitão</option><option>Desenvolvedor</option><option>Pesquisador</option><option>Designer</option><option>Apresentador</option></select></div>
+              <div class="student-field"><label>Foto</label><label class="badge-photo-button" for="foto0">Escolher foto</label><input class="hidden-file" type="file" id="foto0" accept="image/*"></div>
+            </div>
+          </section>
+
+          <section class="badge-person-clean badge-hidden" data-slot="1" id="grupoSegundo">
+            <h3>Segundo crachá</h3>
+            <div class="badge-form-grid">
+              <div class="student-field full"><label for="pessoa1">Participante</label><select id="pessoa1"></select></div>
+              <div class="student-field"><label for="funcao1">Função</label><select id="funcao1"><option>Expositor</option><option>Capitão</option><option>Desenvolvedor</option><option>Pesquisador</option><option>Designer</option><option>Apresentador</option></select></div>
+              <div class="student-field"><label>Foto</label><label class="badge-photo-button" for="foto1">Escolher foto</label><input class="hidden-file" type="file" id="foto1" accept="image/*"></div>
+            </div>
+          </section>
+
+          <div id="aviso" class="badge-alert" role="status" aria-live="polite"></div>
+          <button disabled class="btn success badge-print-button" id="imprimir" type="button">Imprimir / Salvar PDF</button>
+        </aside>
+
+        <section class="badge-preview-clean student-card">
+          <header class="student-card-header"><div><h2>Pré-visualização</h2><p>Os crachás ficam separados, com margem de 5 mm para recorte em cada quadrante A4.</p></div><span id="infoModo" class="student-status">1 crachá</span></header>
+          <div class="badge-sheet" id="folhaImpressao">
+            <div class="badge-quarter active" id="celula0"></div>
+            <div class="badge-quarter empty" id="celula1" data-placeholder="Espaço para outro crachá"></div>
+            <div class="badge-quarter empty" id="celula2" data-placeholder=""></div>
+            <div class="badge-quarter empty" id="celula3" data-placeholder=""></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav" aria-label="Navegação rápida">
+  <a href="aluno.html"><strong>◇</strong><span>Projeto</span></a>
+  <a class="active" href="cracha-aluno.html"><strong>▣</strong><span>Crachá</span></a>
+  <a href="index.html"><strong>↗</strong><span>Vitrine</span></a>
+  <a href="ranking.html"><strong>★</strong><span>Ranking</span></a>
+</nav>
+
+<script src="js/auth.js"></script>
+<script src="js/cracha.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

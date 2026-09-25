@@ -1,222 +1,116 @@
 const { ObjectId } = require('mongodb');
-const logger = require('../utils/Logger');
+const ErrorResponse = require('../utils/ErrorResponse');
 
 module.exports = class AvaliacaoDAOMongo {
     #database;
 
     constructor(databaseInstance) {
-        logger.info('⬆️ AvaliacaoDAOMongo.constructor()');
         this.#database = databaseInstance;
     }
 
-    async create(objAvaliacaoModel) {
-        const method = 'AvaliacaoDAOMongo.create';
-        const projetoId = this.#getProjetoId(objAvaliacaoModel);
-        logger.debug(`🟢 ${method} - Iniciando criação de avaliação`, {
-            projetoId,
-            avaliador: objAvaliacaoModel.avaliador,
-        });
-
-        try {
-            const collection = await this.#database.getCollection('avaliacoes');
-            const doc = this.#modelToDocument(objAvaliacaoModel);
-            const result = await collection.insertOne(doc);
-
-            if (!result.insertedId) {
-                throw new Error('Falha ao inserir avaliação');
-            }
-
-            const insertedId = result.insertedId.toString();
-            logger.info(`✅ ${method} - Avaliação criada com sucesso`, {
-                idAvaliacao: insertedId,
-                projetoId,
-            });
-            return insertedId;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao criar avaliação`, {
-                projetoId,
-                error: error.message,
-                stack: error.stack,
-            });
-            throw error;
-        }
+    async ensureIndexes() {
+        const collection = await this.#database.getCollection('avaliacoes');
+        await collection.createIndex(
+            { projetoId: 1, avaliadorId: 1 },
+            { unique: true, partialFilterExpression: { avaliadorId: { $type: 'string' } } }
+        );
     }
 
-    async delete(objAvaliacaoModel) {
-        const method = 'AvaliacaoDAOMongo.delete';
-        logger.debug(`🟢 ${method} - Iniciando exclusão de avaliação`, {
-            idAvaliacao: objAvaliacaoModel.id,
-        });
-
-        try {
-            const collection = await this.#database.getCollection('avaliacoes');
-            const result = await collection.deleteOne({ _id: new ObjectId(objAvaliacaoModel.id) });
-            const deleted = result.deletedCount > 0;
-
-            if (deleted) {
-                logger.info(`✅ ${method} - Avaliação excluída com sucesso`, {
-                    idAvaliacao: objAvaliacaoModel.id,
-                });
-            } else {
-                logger.warn(`⚠️ ${method} - Avaliação não encontrada para exclusão`, {
-                    idAvaliacao: objAvaliacaoModel.id,
-                });
-            }
-            return deleted;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao excluir avaliação`, {
-                idAvaliacao: objAvaliacaoModel?.id,
-                error: error.message,
-                stack: error.stack,
-            });
+    async create(avaliacao) {
+        const collection = await this.#database.getCollection('avaliacoes');
+        let result;
+        try { result = await collection.insertOne(this.#modelToDocument(avaliacao)); }
+        catch (error) {
+            if (error.code === 11000) throw new ErrorResponse(409, 'Este professor já avaliou o projeto.');
             throw error;
         }
+        if (!result.insertedId) throw new Error('Falha ao inserir avaliação');
+        return result.insertedId.toString();
     }
 
-    async update(objAvaliacaoModel) {
-        const method = 'AvaliacaoDAOMongo.update';
-        logger.debug(`🟢 ${method} - Iniciando atualização de avaliação`, {
-            idAvaliacao: objAvaliacaoModel.id,
-        });
+    async delete(avaliacao) {
+        const collection = await this.#database.getCollection('avaliacoes');
+        const result = await collection.deleteOne({ _id: new ObjectId(avaliacao.id) });
+        return result.deletedCount > 0;
+    }
 
-        try {
-            const collection = await this.#database.getCollection('avaliacoes');
-            const filter = { _id: new ObjectId(objAvaliacaoModel.id) };
-            const update = {
+    async update(avaliacao) {
+        const collection = await this.#database.getCollection('avaliacoes');
+        const result = await collection.updateOne(
+            { _id: new ObjectId(avaliacao.id) },
+            {
                 $set: {
-                    ...this.#modelToDocument(objAvaliacaoModel),
+                    ...this.#modelToDocument(avaliacao),
                     dataAtualizacao: new Date(),
                 },
-            };
-            const result = await collection.updateOne(filter, update);
-            const updated = result.modifiedCount > 0;
-
-            if (updated) {
-                logger.info(`✅ ${method} - Avaliação atualizada com sucesso`, {
-                    idAvaliacao: objAvaliacaoModel.id,
-                });
-            } else {
-                logger.warn(`⚠️ ${method} - Avaliação não encontrada ou sem alterações`, {
-                    idAvaliacao: objAvaliacaoModel.id,
-                });
             }
-            return updated;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao atualizar avaliação`, {
-                idAvaliacao: objAvaliacaoModel?.id,
-                error: error.message,
-                stack: error.stack,
-            });
-            throw error;
-        }
+        );
+        return result.modifiedCount > 0;
     }
 
     async findAll() {
-        const method = 'AvaliacaoDAOMongo.findAll';
-        logger.debug(`🟢 ${method} - Buscando todas as avaliações`);
-
-        try {
-            const collection = await this.#database.getCollection('avaliacoes');
-            const docs = await collection.aggregate(this.#lookupProjetoPipeline()).toArray();
-            const avaliacoes = docs.map(doc => this.#documentToObject(doc));
-
-            logger.info(`✅ ${method} - ${avaliacoes.length} avaliações encontradas`);
-            return avaliacoes;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao buscar todas as avaliações`, {
-                error: error.message,
-                stack: error.stack,
-            });
-            throw error;
-        }
+        const collection = await this.#database.getCollection('avaliacoes');
+        const docs = await collection.aggregate(this.#lookupProjetoPipeline()).toArray();
+        return docs.map(doc => this.#documentToObject(doc));
     }
 
     async findById(idAvaliacao) {
-        const method = 'AvaliacaoDAOMongo.findById';
-        logger.debug(`🟢 ${method} - Buscando avaliação por ID`, { idAvaliacao });
-
-        try {
-            const collection = await this.#database.getCollection('avaliacoes');
-            const pipeline = [
-                { $match: { _id: new ObjectId(idAvaliacao) } },
-                ...this.#lookupProjetoPipeline(),
-            ];
-            const [doc] = await collection.aggregate(pipeline).toArray();
-
-            if (!doc) {
-                logger.warn(`⚠️ ${method} - Avaliação não encontrada`, { idAvaliacao });
-                return null;
-            }
-
-            logger.info(`✅ ${method} - Avaliação encontrada`, { idAvaliacao });
-            return this.#documentToObject(doc);
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao buscar avaliação`, {
-                idAvaliacao,
-                error: error.message,
-                stack: error.stack,
-            });
-            throw error;
-        }
+        const collection = await this.#database.getCollection('avaliacoes');
+        const docs = await collection.aggregate([
+            { $match: { _id: new ObjectId(idAvaliacao) } },
+            ...this.#lookupProjetoPipeline(),
+        ]).toArray();
+        return docs[0] ? this.#documentToObject(docs[0]) : null;
     }
 
     async findByField(field, value) {
-        const method = 'AvaliacaoDAOMongo.findByField';
-        logger.debug(`🟢 ${method} - Buscando avaliações por campo`, { field, value });
-
-        try {
-            const allowedFields = ['id', 'projetoId', 'avaliador', 'status'];
-            if (!allowedFields.includes(field)) {
-                throw new Error(`Campo inválido para busca: ${field}`);
-            }
-
-            let filter;
-            if (field === 'id') filter = { _id: new ObjectId(value) };
-            else if (field === 'projetoId') filter = { projetoId: new ObjectId(value) };
-            else filter = { [field]: value };
-
-            const collection = await this.#database.getCollection('avaliacoes');
-            const pipeline = [{ $match: filter }, ...this.#lookupProjetoPipeline()];
-            const docs = await collection.aggregate(pipeline).toArray();
-            const avaliacoes = docs.map(doc => this.#documentToObject(doc));
-
-            logger.info(`✅ ${method} - ${avaliacoes.length} avaliações encontradas para ${field}=${value}`);
-            return avaliacoes;
-        } catch (error) {
-            logger.error(`❌ ${method} - Erro ao buscar avaliações por campo`, {
-                field,
-                value,
-                error: error.message,
-                stack: error.stack,
-            });
-            throw error;
+        const camposPermitidos = ['id', 'projetoId', 'avaliador', 'avaliadorId', 'status'];
+        if (!camposPermitidos.includes(field)) {
+            throw new Error(`Campo inválido para busca: ${field}`);
         }
+
+        const filter = this.#createFilter(field, value);
+        const collection = await this.#database.getCollection('avaliacoes');
+        const docs = await collection.aggregate([
+            { $match: filter },
+            ...this.#lookupProjetoPipeline(),
+        ]).toArray();
+        return docs.map(doc => this.#documentToObject(doc));
     }
 
-    #getProjetoId(objAvaliacaoModel) {
-        return typeof objAvaliacaoModel.projeto === 'string'
-            ? objAvaliacaoModel.projeto
-            : objAvaliacaoModel.projeto.id;
+    #createFilter(field, value) {
+        if (field === 'id') return { _id: new ObjectId(value) };
+        if (field === 'projetoId') return { projetoId: new ObjectId(value) };
+        return { [field]: value };
     }
 
-    #modelToDocument(objAvaliacaoModel) {
+    #getProjetoId(avaliacao) {
+        return typeof avaliacao.projeto === 'string'
+            ? avaliacao.projeto
+            : avaliacao.projeto.id;
+    }
+
+    #modelToDocument(avaliacao) {
         return {
-            projetoId: new ObjectId(this.#getProjetoId(objAvaliacaoModel)),
-            avaliador: objAvaliacaoModel.avaliador,
-            data: objAvaliacaoModel.data,
-            criatividade: objAvaliacaoModel.criatividade,
-            relevancia: objAvaliacaoModel.relevancia,
-            viabilidade: objAvaliacaoModel.viabilidade,
-            apresentacao: objAvaliacaoModel.apresentacao,
-            conhecimentoTecnico: objAvaliacaoModel.conhecimentoTecnico,
-            funcionalidade: objAvaliacaoModel.funcionalidade,
-            sustentabilidade: objAvaliacaoModel.sustentabilidade,
-            trabalhoEquipe: objAvaliacaoModel.trabalhoEquipe,
-            originalidade: objAvaliacaoModel.originalidade,
-            potencialMercado: objAvaliacaoModel.potencialMercado,
-            comentarios: objAvaliacaoModel.comentarios,
-            notaFinal: objAvaliacaoModel.notaFinal,
-            status: objAvaliacaoModel.status,
+            projetoId: new ObjectId(this.#getProjetoId(avaliacao)),
+            avaliador: avaliacao.avaliador,
+            avaliadorId: avaliacao.avaliadorId,
+            data: avaliacao.data,
+            criatividade: avaliacao.criatividade,
+            relevancia: avaliacao.relevancia,
+            viabilidade: avaliacao.viabilidade,
+            apresentacao: avaliacao.apresentacao,
+            conhecimentoTecnico: avaliacao.conhecimentoTecnico,
+            funcionalidade: avaliacao.funcionalidade,
+            sustentabilidade: avaliacao.sustentabilidade,
+            trabalhoEquipe: avaliacao.trabalhoEquipe,
+            originalidade: avaliacao.originalidade,
+            potencialMercado: avaliacao.potencialMercado,
+            comentarios: avaliacao.comentarios,
+            notaFinal: avaliacao.notaFinal,
+            status: avaliacao.status,
+            avaliacaoAlunos: avaliacao.avaliacaoAlunos,
+            comentarioInterno: avaliacao.comentarioInterno,
         };
     }
 
@@ -240,10 +134,13 @@ module.exports = class AvaliacaoDAOMongo {
             id: doc._id.toString(),
             projeto: doc.projeto ? {
                 id: doc.projeto._id.toString(),
-                titulo: doc.projeto.titulo,
+                tema: doc.projeto.tema,
+                curso: doc.projeto.curso,
+                titulo: doc.projeto.tema || doc.projeto.titulo,
                 descricao: doc.projeto.descricao,
             } : null,
             avaliador: doc.avaliador,
+            avaliadorId: doc.avaliadorId || null,
             data: doc.data,
             criatividade: doc.criatividade,
             relevancia: doc.relevancia,
@@ -258,6 +155,8 @@ module.exports = class AvaliacaoDAOMongo {
             comentarios: doc.comentarios || [],
             notaFinal: doc.notaFinal,
             status: doc.status,
+            avaliacaoAlunos: doc.avaliacaoAlunos || [],
+            comentarioInterno: doc.comentarioInterno || '',
             dataAtualizacao: doc.dataAtualizacao,
         };
     }

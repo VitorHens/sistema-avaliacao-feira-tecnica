@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
+  <title>Avaliar Projeto | Feira Técnica</title>
+  <link rel="stylesheet" href="css/evaluator.css">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="evaluator-area experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Avaliação</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link" href="dashboard.html"><span class="ico">⌂</span>Painel</a>
+      <a class="nav-link" href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a>
+      <a class="nav-link active" href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a>
+      <a class="nav-link" href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">↗</span>Ranking</a>
+      <a class="nav-link admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar planilha</a>
+      <a class="nav-link admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a>
+      <a class="nav-link admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Professor</strong><span id="roleMini">Avaliador</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar"><div><h1>Nova avaliação</h1><p>Avalie o projeto com critérios claros e finalize quando estiver pronto.</p></div><div class="top-actions"><a class="btn ghost sm" href="projetos-consulta.html">Projetos</a><a class="btn ghost sm" href="avaliacoes-consulta.html">Histórico</a></div></header>
+
+    <main id="conteudo" class="evaluator-main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">03 / RECONHECER · UNIVAP CENTRO</span><h2>Um olhar atento. <em>Novas possibilidades.</em></h2><p>Avalie com os mesmos critérios e ofereça um retorno que ajude cada equipe a ir além.</p></div></section>
+      <div id="alerta" class="alert" role="status" aria-live="polite"></div>
+      <header class="eval-page-head"><div><h2>Avaliação da banca</h2><p>Selecione o projeto, atribua as notas e registre um parecer. Você pode salvar como rascunho antes de finalizar.</p></div></header>
+
+      <form id="form" novalidate>
+        <div class="eval-compose">
+          <div class="eval-compose-main">
+            <section class="eval-section">
+              <div class="eval-section-title"><div><h2>1. Projeto</h2><p>Confirme a equipe que será avaliada.</p></div><span class="eval-state" id="projectState">Selecione</span></div>
+              <div class="eval-project-picker">
+                <div class="field"><label for="projetoId">Projeto</label><select id="projetoId" required><option value="">Carregando projetos...</option></select></div>
+                <div class="field"><label for="avaliador">Avaliador</label><input id="avaliador" readonly></div>
+              </div>
+              <div id="projetoResumo" class="eval-project-preview empty" style="margin-top:12px">Selecione um projeto para ver os dados principais.</div>
+            </section>
+
+            <section class="eval-section">
+              <div class="eval-section-title"><div><h2>2. Critérios do projeto</h2><p>Use de 1 a 5 estrelas. Cada estrela corresponde a 2 pontos.</p></div><span class="eval-state" id="criteriaState">0 de 10</span></div>
+              <div id="criterios" class="criteria-grid"></div>
+            </section>
+
+            <details class="eval-optional" id="studentDetails">
+              <summary>3. Avaliação individual da equipe <span class="small-muted">(opcional)</span></summary>
+              <div class="eval-optional-body">
+                <p class="small-muted" style="margin-top:0">Preencha somente se quiser registrar notas individuais. Se começar a avaliar um aluno, complete os quatro critérios dele.</p>
+                <div id="alunos" class="student-eval-list"><div class="eval-empty">Selecione um projeto primeiro.</div></div>
+              </div>
+            </details>
+
+            <section class="eval-section">
+              <div class="eval-section-title"><div><h2>4. Parecer</h2><p>Registre um comentário geral sobre a apresentação. Este campo é opcional.</p></div></div>
+              <div class="field"><label for="comentario">Feedback geral</label><textarea id="comentario" rows="5" placeholder="Pontos fortes, aspectos a melhorar ou observações da banca."></textarea></div>
+            </section>
+          </div>
+
+          <aside class="eval-summary-side">
+            <section class="score-summary">
+              <span class="score-summary-label">Média atual</span>
+              <div class="score-summary-value" id="media">0,0</div>
+              <small>de 10,0 pontos</small>
+              <div class="score-progress"><span id="scoreProgress"></span></div>
+              <div class="score-progress-text" id="scoreProgressText">0 de 10 critérios preenchidos</div>
+              <div class="score-side-actions">
+                <button class="btn ghost" type="button" id="salvarRascunho">Salvar rascunho</button>
+                <button class="btn success" type="submit">Finalizar avaliação</button>
+              </div>
+            </section>
+
+            <section class="eval-panel">
+              <div class="eval-panel-head"><div><h3>Antes de finalizar</h3><p>A avaliação final entra no ranking público.</p></div></div>
+              <div class="eval-stack">
+                <div class="eval-task"><div class="eval-task-main"><strong>Projeto selecionado</strong><span id="checkProjeto">Pendente</span></div></div>
+                <div class="eval-task"><div class="eval-task-main"><strong>10 critérios</strong><span id="checkCriterios">0 preenchidos</span></div></div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav" aria-label="Navegação rápida">
+  <a href="dashboard.html"><strong>⌂</strong><span>Painel</span></a>
+  <a href="projetos-consulta.html"><strong>◇</strong><span>Projetos</span></a>
+  <a class="active" href="avaliacoes-cadastro.html"><strong>★</strong><span>Avaliar</span></a>
+  <a href="avaliacoes-consulta.html"><strong>✓</strong><span>Histórico</span></a>
+</nav>
+
+<script src="js/auth.js"></script>
+<script>
+if(!['ADMINISTRADOR','AVALIADOR'].includes(SESSAO.role)) location.replace('aluno.html');
+const admin=SESSAO.role==='ADMINISTRADOR';
+document.getElementById('roleMini').textContent=admin?'Administrador':'Professor avaliador';
+document.getElementById('avaliador').value=SESSAO.usuario.nome||SESSAO.usuario.email||'';
+
+const criterios=[
+  ['criatividade','Criatividade e inovação'],
+  ['relevancia','Relevância do problema'],
+  ['viabilidade','Viabilidade da solução'],
+  ['apresentacao','Qualidade da apresentação'],
+  ['conhecimentoTecnico','Domínio técnico'],
+  ['funcionalidade','Funcionamento / protótipo'],
+  ['sustentabilidade','Sustentabilidade / impacto'],
+  ['trabalhoEquipe','Trabalho em equipe'],
+  ['originalidade','Originalidade'],
+  ['potencialMercado','Potencial de aplicação']
+];
+const criterioAluno=[
+  ['participacao','Participação'],['dominio','Domínio'],['comunicacao','Comunicação'],['comprometimento','Comprometimento']
+];
+const box=document.getElementById('criterios');
+const alerta=document.getElementById('alerta');
+const sel=document.getElementById('projetoId');
+let projetos=[];
+
+function estrelas(name,prefix=''){
+  const idBase=`${prefix}${name}`;
+  return `<div class="star-rating" data-rating="${idBase}" role="group" aria-label="${escapeHtml((criterios.find(c=>c[0]===name)||criterioAluno.find(c=>c[0]===name)||[name,name])[1])}">${[5,4,3,2,1].map(star=>`<input type="radio" id="${idBase}-${star}" name="${idBase}" value="${star*2}" aria-label="${star*2} pontos"><label for="${idBase}-${star}" title="${star*2} pontos">★</label>`).join('')}</div>`;
+}
+
+box.innerHTML=criterios.map(([id,nome])=>`<article class="criterion-card"><div class="criterion-head"><strong>${nome}</strong><span class="criterion-score" id="score-${id}">—</span></div>${estrelas(id)}<div class="criterion-scale"><span>2 pts</span><span>10 pts</span></div></article>`).join('');
+
+function criterioSelecionado(id){const input=document.querySelector(`input[name="${id}"]:checked`);return input?Number(input.value):null}
+function atualizarResumo(){
+  const valores=criterios.map(([id])=>criterioSelecionado(id)).filter(Number.isFinite);
+  const qtd=valores.length;
+  const media=qtd?valores.reduce((a,b)=>a+b,0)/qtd:0;
+  document.getElementById('media').textContent=media.toFixed(1).replace('.',',');
+  document.getElementById('scoreProgress').style.width=`${qtd/criterios.length*100}%`;
+  document.getElementById('scoreProgressText').textContent=`${qtd} de ${criterios.length} critérios preenchidos`;
+  document.getElementById('criteriaState').textContent=`${qtd} de ${criterios.length}`;
+  document.getElementById('checkCriterios').textContent=`${qtd} preenchidos`;
+  criterios.forEach(([id])=>{const v=criterioSelecionado(id);document.getElementById(`score-${id}`).textContent=Number.isFinite(v)?`${v} pts`:'—'});
+}
+box.addEventListener('change',atualizarResumo);
+
+async function carregarProjetos(){
+  const [rp,ra]=await Promise.all([api('/api/v1/projetos'),api('/api/v1/avaliacoes')]);
+  const avaliacoes=ra.data.avaliacoes||[];
+  projetos=rp.data.projetos||[];
+  const minhasIds=new Set(avaliacoes.filter(a=>a.avaliador===SESSAO.usuario.nome).map(a=>a.projeto?.id||a.projetoId));
+  sel.innerHTML='<option value="">Selecione um projeto...</option>'+projetos.map(p=>`<option value="${escapeHtml(p.id)}" ${minhasIds.has(p.id)?'disabled':''}>${escapeHtml(p.tema)} — ${escapeHtml(p.curso||'Curso')}${minhasIds.has(p.id)?' — já avaliado':''}</option>`).join('');
+  const q=new URLSearchParams(location.search).get('projeto');
+  if(q&&projetos.some(p=>p.id===q)&&!minhasIds.has(q)){sel.value=q;renderProjeto()}
+}
+
+function renderProjeto(){
+  const p=projetos.find(x=>x.id===sel.value);
+  const res=document.getElementById('projetoResumo');
+  const alunos=document.getElementById('alunos');
+  document.getElementById('checkProjeto').textContent=p?'Selecionado':'Pendente';
+  document.getElementById('projectState').textContent=p?'Pronto':'Selecione';
+  document.getElementById('projectState').className=`eval-state ${p?'done':'pending'}`;
+  if(!p){res.className='eval-project-preview empty';res.textContent='Selecione um projeto para ver os dados principais.';alunos.innerHTML='<div class="eval-empty">Selecione um projeto primeiro.</div>';return}
+  const pessoas=[p.representante,...(p.integrantes||[])].filter(Boolean);
+  res.className='eval-project-preview';
+  res.innerHTML=`<span class="pill">${escapeHtml(p.statusProjeto||'PROJETO')}</span><h3>${escapeHtml(p.tema)}</h3><p>${escapeHtml(p.curso||'Curso')}${p.localizacao?` · ${escapeHtml(p.localizacao)}`:''} · ${pessoas.length} ${pessoas.length===1?'integrante':'integrantes'}</p>`;
+  alunos.innerHTML=pessoas.map((x,i)=>{
+    const prefix=`aluno_${i}_`;
+    return `<article class="student-eval-card" data-matricula="${escapeHtml(x.matricula||'')}" data-nome="${escapeHtml(x.nome||'')}"><div class="student-eval-head"><strong>${escapeHtml(x.nome||'Aluno')}</strong><span class="pill">${i===0?'Representante':'Integrante'}</span></div><div class="student-criteria-grid">${criterioAluno.map(([id,nome])=>`<div class="student-criterion"><span>${nome}</span>${estrelas(id,prefix)}</div>`).join('')}</div><div class="field" style="margin-top:10px"><label>Observação</label><textarea data-comentario rows="2" placeholder="Opcional"></textarea></div></article>`;
+  }).join('');
+}
+sel.addEventListener('change',renderProjeto);
+
+function alunosPayload(modo){
+  const resultado=[];
+  for(const el of document.querySelectorAll('.student-eval-card')){
+    const prefix=[...el.querySelectorAll('[data-rating]')][0]?.dataset.rating?.replace(/participacao$/,'')||'';
+    const valores={};
+    let algum=false;
+    for(const [id] of criterioAluno){
+      const checked=el.querySelector(`input[name="${prefix}${id}"]:checked`);
+      valores[id]=checked?Number(checked.value):null;
+      if(checked)algum=true;
+    }
+    const comentario=el.querySelector('[data-comentario]')?.value.trim()||'';
+    if(!algum&&!comentario)continue;
+    if(Object.values(valores).some(v=>!Number.isFinite(v))){
+      if(modo==='final')throw new Error(`Complete os quatro critérios individuais de ${el.dataset.nome}.`);
+      for(const k of Object.keys(valores))if(!Number.isFinite(valores[k]))valores[k]=0;
+    }
+    resultado.push({nome:el.dataset.nome,matricula:el.dataset.matricula,...valores,comentario});
+  }
+  return resultado;
+}
+
+function montarAvaliacao(modo){
+  if(!sel.value)throw new Error('Selecione um projeto para avaliar.');
+  const dados={projetoId:sel.value,avaliador:SESSAO.usuario.nome,status:modo==='final'?'Classificado':'Em análise',comentarios:[],comentarioInterno:'',avaliacaoAlunos:alunosPayload(modo)};
+  const comentario=document.getElementById('comentario').value.trim();
+  if(comentario)dados.comentarios=[comentario];
+  const faltantes=[];
+  criterios.forEach(([id,nome])=>{const valor=criterioSelecionado(id);if(!Number.isFinite(valor)){faltantes.push(nome);dados[id]=0}else dados[id]=valor});
+  if(modo==='final'&&faltantes.length)throw new Error(`Preencha todos os critérios antes de finalizar. Faltam ${faltantes.length}.`);
+  return dados;
+}
+
+async function enviar(modo){
+  try{
+    limparAlerta(alerta);
+    const avaliacao=montarAvaliacao(modo);
+    const r=await api('/api/v1/avaliacoes',{method:'POST',body:JSON.stringify({avaliacao})});
+    const criada=r.data.avaliacao;
+    if(modo==='rascunho'){
+      location.href=`avaliacoes-editar.html?id=${encodeURIComponent(criada.id)}`;
+      return;
+    }
+    mostrarAlerta(alerta,'ok',`Avaliação finalizada · média ${Number(criada.notaFinal||0).toFixed(1).replace('.',',')}`);
+    setTimeout(()=>location.href='avaliacoes-consulta.html',700);
+  }catch(e){mostrarAlerta(alerta,'error',e.message);window.scrollTo({top:0,behavior:'smooth'})}
+}
+
+document.getElementById('salvarRascunho').addEventListener('click',()=>enviar('rascunho'));
+document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();enviar('final')});
+carregarProjetos().catch(e=>mostrarAlerta(alerta,'error',e.message));
+atualizarResumo();
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

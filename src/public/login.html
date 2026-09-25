@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#082d53">
+  <title>Acesso | Feira Técnica 2026</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="stylesheet" href="css/login-centered.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience login-centered">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<main id="conteudo" class="login-page">
+  <section class="login-shell" aria-label="Acesso à Feira Técnica">
+    <header class="login-brand">
+      <img src="imagens/logo.png" alt="UNIVAP">
+      <div>
+        <strong>Feira Técnica 2026</strong>
+        <span>Área de projetos e avaliação</span>
+      </div>
+    </header>
+
+    <div class="login-card">
+      <header class="login-head">
+        <span class="login-kicker">Ambiente oficial UNIVAP</span>
+        <h1>Conecte-se ao que vem <em>depois.</em></h1>
+        <p>Selecione seu perfil e informe seus dados de acesso.</p>
+      </header>
+
+      <div class="login-tabs" role="tablist" aria-label="Perfil de acesso">
+        <button class="role-tab active" type="button" data-role="Professor" role="tab" aria-selected="true">
+          <span class="role-title">Professor</span><small>Avaliações</small>
+        </button>
+        <button class="role-tab" type="button" data-role="Aluno" role="tab" aria-selected="false">
+          <span class="role-title">Aluno</span><small>Meu projeto</small>
+        </button>
+        <button class="role-tab" type="button" data-role="Visitante" role="tab" aria-selected="false">
+          <span class="role-title">Visitante</span><small>Explorar</small>
+        </button>
+      </div>
+
+      <div id="alerta" class="alert" role="status" aria-live="polite"></div>
+
+      <div id="loginPanel" class="profile-panel active">
+        <form id="loginForm">
+          <div class="field">
+            <label id="labelIdentificacao" for="identificacao">ID numérico do professor ou e-mail do administrador</label>
+            <input id="identificacao" autocomplete="username" inputmode="text" placeholder="ID numérico ou e-mail" required>
+          </div>
+          <div class="field">
+            <label for="senha">Senha do sistema da feira</label>
+            <div class="login-password">
+              <input id="senha" type="password" autocomplete="current-password" placeholder="Senha fornecida pela organização" required aria-describedby="senhaAjuda">
+              <button type="button" id="mostrarSenha" aria-label="Mostrar senha">Mostrar</button>
+            </div>
+          </div>
+          <p id="senhaAjuda" style="font-size:12px;color:var(--text-muted)">Use a senha de acesso da feira. Ela não é a senha do seu Gmail.</p>
+          <button class="btn login-submit" type="submit" id="entrar"><span>Entrar</span><span aria-hidden="true">→</span></button>
+        </form>
+      </div>
+
+      <div id="visitorPanel" class="profile-panel" aria-hidden="true">
+        <div class="visitor-minimal">
+          <div><strong>Acesso para visitantes</strong><span>Conheça os projetos e deixe sua avaliação do público sem login. As notas dos professores ficam separadas.</span></div>
+          <a class="btn login-submit" href="index.html"><span>Explorar a feira</span><span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+
+      <p class="login-foot">Feira Técnica 2026 · Ambiente acadêmico UNIVAP</p>
+    </div>
+
+    <a class="login-back" href="index.html">← Voltar para a experiência</a>
+  </section>
+</main>
+
+<script>
+let perfil='Professor';
+const tabs=[...document.querySelectorAll('.role-tab')];
+const form=document.getElementById('loginForm');
+const loginPanel=document.getElementById('loginPanel');
+const visitorPanel=document.getElementById('visitorPanel');
+const alerta=document.getElementById('alerta');
+const ident=document.getElementById('identificacao');
+const senha=document.getElementById('senha');
+const label=document.getElementById('labelIdentificacao');
+const entrar=document.getElementById('entrar');
+
+function setPerfil(p){
+  perfil=p;
+  const visitante=p==='Visitante';
+  tabs.forEach(b=>{
+    const ativo=b.dataset.role===p; b.id='perfil-'+b.dataset.role.toLowerCase(); b.setAttribute('aria-controls',b.dataset.role==='Visitante'?'visitorPanel':'loginPanel');
+    b.classList.toggle('active',ativo);
+    b.setAttribute('aria-selected',String(ativo)); b.tabIndex=ativo?0:-1;
+  });
+  alerta.className='alert';
+  alerta.textContent='';
+  loginPanel.setAttribute('role','tabpanel'); loginPanel.setAttribute('aria-labelledby','perfil-'+p.toLowerCase()); visitorPanel.setAttribute('role','tabpanel'); visitorPanel.setAttribute('aria-labelledby','perfil-visitante');
+  loginPanel.classList.toggle('active',!visitante);
+  visitorPanel.classList.toggle('active',visitante);
+  visitorPanel.setAttribute('aria-hidden',String(!visitante)); loginPanel.hidden=visitante; visitorPanel.hidden=!visitante;
+  if(visitante)return;
+  if(p==='Aluno'){
+    label.textContent='Matrícula ou e-mail';
+    ident.placeholder='Matrícula ou e-mail';
+    ident.inputMode='text';
+    senha.placeholder='Sua turma (ex.: 2J)';
+    document.getElementById('senhaAjuda').textContent='A senha inicial é sua turma em letras maiúsculas, como no cadastro. Não use a senha do Gmail.';
+  }else{
+    label.textContent='ID numérico do professor ou e-mail do administrador';
+    ident.placeholder='ID numérico ou e-mail';
+    ident.inputMode='text';
+    senha.placeholder='Senha fornecida pela organização';
+    document.getElementById('senhaAjuda').textContent='Professores entram pelo ID e senha inicial da escola. Administradores usam e-mail e senha própria.';
+  }
+
+}
+
+tabs.forEach(b=>b.addEventListener('click',()=>setPerfil(b.dataset.role)));
+
+document.getElementById('mostrarSenha').addEventListener('click',e=>{
+  const visivel=senha.type==='text';
+  senha.type=visivel?'password':'text';
+  e.currentTarget.textContent=visivel?'Mostrar':'Ocultar'; e.currentTarget.setAttribute('aria-label',visivel?'Mostrar senha':'Ocultar senha'); e.currentTarget.setAttribute('aria-pressed',String(!visivel));
+});
+
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  alerta.className='alert';
+  entrar.disabled=true;
+  entrar.querySelector('span:first-child').textContent='Entrando...';
+  try{
+    const endpoint=perfil==='Aluno'?'api/v1/alunos/login':'api/v1/professores/login';
+    const body=perfil==='Aluno'
+      ?{aluno:{identificacao:ident.value.trim(),senha:senha.value}}
+      :{professor:{identificacao:ident.value.trim(),senha:senha.value}};
+    const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>null);
+    if(!r.ok||!d?.success||!d?.data?.token)throw new Error(d?.error?.message||d?.message||'Não foi possível entrar.');
+    localStorage.setItem('tokenJWT',d.data.token);
+    localStorage.setItem('userData',JSON.stringify(d));
+    localStorage.setItem('perfilUsuario',perfil);
+    const next=new URLSearchParams(location.search).get('next');
+    let destino=perfil==='Aluno'?'aluno.html':'dashboard.html';
+    if(next&&next.startsWith('/')&&!next.includes('\\')){
+      try{const url=new URL(next,location.origin);if(url.origin===location.origin)destino=url.pathname+url.search+url.hash}catch(_){/* Usa a área inicial do perfil. */}
+    }
+    location.replace(destino);
+  }catch(err){
+    alerta.className='alert show error';
+    alerta.textContent=err.message;
+    senha.select();
+  }finally{
+    entrar.disabled=false;
+    entrar.querySelector('span:first-child').textContent='Entrar';
+  }
+});
+
+setPerfil(new URLSearchParams(location.search).get('perfil')==='aluno'?'Aluno':'Professor');
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

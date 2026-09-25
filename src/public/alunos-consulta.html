@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Alunos | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link  " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link  admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link active admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Alunos</h1><p>Contas de alunos cadastradas.</p></div><div class="top-actions"><a class="btn ghost sm" href="dashboard.html">Painel</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">ORGANIZAÇÃO / ESTUDANTES · UNIVAP CENTRO</span><h2>As pessoas por trás <em>das ideias.</em></h2><p>Encontre estudantes por nome, matrícula, turma ou curso.</p></div></section><div class="section-title">
+<div>
+<h2>Alunos</h2>
+<p id="contagem">Carregando...</p>
+</div>
+</div>
+<div class="list" id="lista"></div></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script>
+    if (SESSAO.role !== "ADMINISTRADOR") location.replace("dashboard.html");
+
+    const contagem = document.getElementById("contagem");
+    const lista = document.getElementById("lista");
+
+    async function carregarAlunos() {
+      try {
+        const resposta = await api("/api/v1/alunos");
+        const alunos = resposta.data.alunos || [];
+        contagem.textContent = `${alunos.length} conta(s) cadastrada(s)`;
+
+        lista.innerHTML = alunos.length
+          ? alunos.map(aluno => `
+              <div class="list-item">
+                <div>
+                  <strong>${escapeHtml(aluno.nome)}</strong>
+                  <span>${escapeHtml(aluno.email)} · matrícula ${escapeHtml(aluno.matricula)} · ${escapeHtml(aluno.turma)}</span>
+                </div>
+                <span class="pill">${escapeHtml(aluno.curso)}</span>
+              </div>
+            `).join("")
+          : '<div class="card">Nenhum aluno cadastrado.</div>';
+      } catch (error) {
+        lista.innerHTML = `<div class="alert show error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    carregarAlunos();
+  </script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

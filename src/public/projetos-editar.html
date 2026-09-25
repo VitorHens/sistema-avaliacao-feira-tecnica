@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Editar projeto | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link active " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link  admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link  admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Editar projeto</h1><p>Atualize os dados administrativos do projeto.</p></div><div class="top-actions"><a class="btn ghost sm" href="dashboard.html">Painel</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">ORGANIZAÇÃO / PROJETOS · UNIVAP CENTRO</span><h2>A base de uma <em>boa apresentação.</em></h2><p>Confira os dados oficiais, os integrantes e a localização do estande.</p></div></section><div class="alert" id="alerta"></div>
+<form id="form">
+<fieldset><legend>Selecionar projeto</legend><div class="field"><label for="projetoId">Projeto</label><select id="projetoId" required=""><option value="">Carregando...</option></select></div></fieldset>
+<fieldset><legend>Projeto</legend>
+<div class="form-grid">
+<div class="field"><label for="tema">Tema</label><input id="tema" minlength="3" placeholder="Tema do projeto" required=""/></div>
+<div class="field"><label for="curso">Curso</label><select id="curso" required="">
+<option value="">Selecione...</option><option>INFORMÁTICA</option><option>ELETRÔNICA</option><option>ADMINISTRAÇÃO</option><option>ANÁLISES CLÍNICAS</option><option>PUBLICIDADE</option><option>QUÍMICA</option>
+</select></div>
+<div class="field"><label for="equipamento">Equipamento</label><select id="equipamento" required=""><option>EQUIPE TRAZ SEU COMPUTADOR</option><option>COMPUTADOR DA ESCOLA</option></select></div>
+<div class="field"><label for="outrosRecursos">Outros recursos</label><input id="outrosRecursos" placeholder="Opcional"/></div>
+<div class="field"><label for="localizacao">Local do estande</label><input id="localizacao" placeholder="Bloco / sala / estande"></div>
+<div class="field full"><label for="observacoes">Observações</label><textarea id="observacoes" placeholder="Opcional"></textarea></div>
+</div>
+</fieldset>
+<fieldset><legend>Representante</legend>
+<div class="form-grid">
+<div class="field"><label for="repNome">Nome</label><input id="repNome" minlength="3" required=""/></div>
+<div class="field"><label for="repMatricula">Matrícula</label><input id="repMatricula" required=""/></div>
+<div class="field"><label for="repTurma">Turma</label><input id="repTurma" placeholder="2INFO" required=""/></div>
+<div class="field"><label for="repEmail">E-mail</label><input id="repEmail" required="" type="email"/></div>
+</div>
+</fieldset>
+<fieldset>
+<legend>Integrantes</legend>
+<p class="help">A equipe deve ter de 2 a 10 estudantes, incluindo o representante.</p>
+<div id="integrantesContainer"></div>
+<div class="form-actions"><button class="btn light" id="adicionarIntegrante" type="button">+ Adicionar integrante</button></div>
+</fieldset>
+<div class="form-actions"><button class="btn sec" type="submit">Salvar alterações</button></div>
+</form></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script>
+
+const elTema = document.getElementById("tema");
+const elCurso = document.getElementById("curso");
+const elEquipamento = document.getElementById("equipamento");
+const elOutrosRecursos = document.getElementById("outrosRecursos");
+const elObservacoes = document.getElementById("observacoes");
+const elRepNome = document.getElementById("repNome");
+const elRepMatricula = document.getElementById("repMatricula");
+const elRepTurma = document.getElementById("repTurma");
+const elRepEmail = document.getElementById("repEmail");
+const integrantesContainer = document.getElementById("integrantesContainer");
+
+function atualizarRemover() {
+  const itens = [...integrantesContainer.querySelectorAll(".integrante-item")];
+  itens.forEach(item => {
+    const botao = item.querySelector(".remover-integrante");
+    botao.disabled = itens.length <= 1;
+    botao.style.opacity = itens.length <= 1 ? ".45" : "1";
+  });
+}
+
+function adicionarIntegrante(dados = {}) {
+  const total = integrantesContainer.querySelectorAll(".integrante-item").length;
+  if (total >= 9) {
+    alert("São permitidos no máximo 9 integrantes além do representante.");
+    return;
+  }
+
+  const item = document.createElement("div");
+  item.className = "integrante-item";
+  item.style.cssText = "margin-top:12px;padding:14px;border:1px solid #d9e2ee;border-radius:10px;background:#fafcff";
+  item.innerHTML = `
+    <div class="form-grid">
+      <div class="field"><label>Nome</label><input data-campo="nome" required minlength="3" value="${escapeHtml(dados.nome || "")}"></div>
+      <div class="field"><label>Matrícula</label><input data-campo="matricula" required value="${escapeHtml(dados.matricula || "")}"></div>
+      <div class="field"><label>Turma</label><input data-campo="turma" required value="${escapeHtml(dados.turma || "")}"></div>
+      <div class="field"><label>E-mail (opcional)</label><input data-campo="email" type="email" value="${escapeHtml(dados.email || "")}"></div>
+    </div>
+    <div class="form-actions"><button class="btn danger remover-integrante" type="button">Remover</button></div>
+  `;
+  item.querySelector(".remover-integrante").addEventListener("click", () => {
+    item.remove();
+    atualizarRemover();
+  });
+  integrantesContainer.appendChild(item);
+  atualizarRemover();
+}
+
+document.getElementById("adicionarIntegrante").addEventListener("click", () => adicionarIntegrante());
+
+function projetoDoFormulario() {
+  const integrantes = [...integrantesContainer.querySelectorAll(".integrante-item")].map(item => ({
+    nome: item.querySelector('[data-campo="nome"]').value.trim(),
+    matricula: item.querySelector('[data-campo="matricula"]').value.trim(),
+    turma: item.querySelector('[data-campo="turma"]').value.trim(),
+    email: item.querySelector('[data-campo="email"]').value.trim() || null
+  }));
+
+  return {
+    tema: elTema.value.trim(),
+    localizacao: document.getElementById("localizacao").value.trim(),
+    curso: elCurso.value,
+    equipamento: elEquipamento.value,
+    outrosRecursos: elOutrosRecursos.value.trim() || null,
+    observacoes: elObservacoes.value.trim() || null,
+    representante: {
+      nome: elRepNome.value.trim(),
+      matricula: elRepMatricula.value.trim(),
+      turma: elRepTurma.value.trim(),
+      email: elRepEmail.value.trim()
+    },
+    integrantes
+  };
+}
+
+const alerta = document.getElementById("alerta");
+const sel = document.getElementById("projetoId");
+let lista = [];
+
+function preencher() {
+  const p = lista.find(x => x.id === sel.value);
+  if (!p) return;
+
+  elTema.value = p.tema || "";
+  elCurso.value = p.curso || "";
+  elEquipamento.value = p.equipamento || "EQUIPE TRAZ SEU COMPUTADOR";
+  elOutrosRecursos.value = p.outrosRecursos || "";
+  elObservacoes.value = p.observacoes || "";
+  document.getElementById("localizacao").value = p.localizacao || "";
+  elRepNome.value = p.representante?.nome || "";
+  elRepMatricula.value = p.representante?.matricula || "";
+  elRepTurma.value = p.representante?.turma || "";
+  elRepEmail.value = p.representante?.email || "";
+
+  integrantesContainer.innerHTML = "";
+  const integrantes = p.integrantes?.length ? p.integrantes : [{}];
+  integrantes.forEach(adicionarIntegrante);
+}
+
+async function carregar() {
+  try {
+    const r = await api("/api/v1/projetos");
+    lista = r.data.projetos || [];
+    sel.innerHTML = '<option value="">Selecione...</option>' + lista.map(p =>
+      `<option value="${escapeHtml(p.id)}">${escapeHtml(p.tema)} — ${escapeHtml(p.curso)}</option>`
+    ).join("");
+
+    const q = new URLSearchParams(location.search).get("id");
+    if (q) {
+      sel.value = q;
+      preencher();
+    }
+  } catch (e) {
+    mostrarAlerta(alerta, "error", e.message);
+  }
+}
+
+sel.addEventListener("change", preencher);
+
+document.getElementById("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!sel.value) return mostrarAlerta(alerta, "error", "Selecione um projeto.");
+
+  try {
+    const r = await api(`/api/v1/projetos/${sel.value}`, {
+      method: "PUT",
+      body: JSON.stringify({ projeto: projetoDoFormulario() })
+    });
+    const idAtual = r.data.projeto?.id || sel.value;
+    mostrarAlerta(alerta, "ok", `✓ ${r.message}`);
+    await carregar();
+    sel.value = idAtual;
+    preencher();
+  } catch (e) {
+    mostrarAlerta(alerta, "error", e.message);
+  }
+});
+carregar();
+
+</script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

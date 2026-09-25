@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
+  <title>Avaliações | Feira Técnica</title>
+  <link rel="stylesheet" href="css/evaluator.css">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="evaluator-area experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Avaliações</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link" href="dashboard.html"><span class="ico">⌂</span>Painel</a>
+      <a class="nav-link" href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a>
+      <a class="nav-link" href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a>
+      <a class="nav-link active" href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">↗</span>Ranking</a>
+      <a class="nav-link admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar planilha</a>
+      <a class="nav-link admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a>
+      <a class="nav-link admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span id="roleMini">Avaliador</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar"><div><h1>Avaliações</h1><p>Consulte rascunhos e avaliações já concluídas.</p></div><div class="top-actions"><a class="btn sm" href="avaliacoes-cadastro.html">Nova avaliação</a></div></header>
+    <main id="conteudo" class="evaluator-main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">SEU PERCURSO / AVALIAÇÕES · UNIVAP CENTRO</span><h2>Cada olhar <em>faz diferença.</em></h2><p>Encontre registros concluídos e continue os rascunhos que ainda precisam da sua atenção.</p></div></section>
+      <div id="alerta" class="alert" role="status" aria-live="polite"></div>
+      <header class="eval-page-head"><div><h2 id="tituloLista">Minhas avaliações</h2><p id="descricaoLista">Revise uma avaliação, continue um rascunho ou confira a nota registrada.</p></div></header>
+
+      <section class="eval-panel">
+        <div class="eval-toolbar">
+          <div class="field"><label for="busca">Buscar</label><input id="busca" placeholder="Projeto ou avaliador..."></div>
+          <div class="field"><label for="filtroStatus">Situação</label><select id="filtroStatus"><option value="TODOS">Todas</option><option value="Em análise">Rascunhos</option><option value="Classificado">Finalizadas</option><option value="Aprovado">Aprovadas</option><option value="Reprovado">Reprovadas</option></select></div>
+          <div class="field"><label for="ordenacao">Ordenar</label><select id="ordenacao"><option value="RECENTES">Mais recentes</option><option value="NOTA_DESC">Maior nota</option><option value="NOTA_ASC">Menor nota</option></select></div>
+        </div>
+        <div class="eval-filter-summary"><span id="resumo">Carregando avaliações...</span><span>Atalho: pressione <strong>/</strong> para buscar</span></div>
+        <div id="lista" class="eval-history-list"><div class="eval-empty">Carregando avaliações...</div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav" aria-label="Navegação rápida">
+  <a href="dashboard.html"><strong>⌂</strong><span>Painel</span></a>
+  <a href="projetos-consulta.html"><strong>◇</strong><span>Projetos</span></a>
+  <a href="avaliacoes-cadastro.html"><strong>★</strong><span>Avaliar</span></a>
+  <a class="active" href="avaliacoes-consulta.html"><strong>✓</strong><span>Histórico</span></a>
+</nav>
+
+<script src="js/auth.js"></script>
+<script>
+if(SESSAO.role==='ALUNO') location.replace('aluno.html');
+const admin=SESSAO.role==='ADMINISTRADOR';
+document.getElementById('roleMini').textContent=admin?'Administrador':'Professor avaliador';
+if(admin){document.getElementById('tituloLista').textContent='Avaliações da banca';document.getElementById('descricaoLista').textContent='Consulte avaliações de todos os professores e revise os registros quando necessário.'}
+
+const busca=document.getElementById('busca');
+const filtroStatus=document.getElementById('filtroStatus');
+const ordenacao=document.getElementById('ordenacao');
+const resumo=document.getElementById('resumo');
+const lista=document.getElementById('lista');
+const alerta=document.getElementById('alerta');
+let avaliacoes=[];
+
+function formatarData(value){if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})}
+function statusClass(status){return status==='Em análise'?'draft':'done'}
+function statusLabel(status){return status==='Em análise'?'Rascunho':status||'Finalizada'}
+
+function render(){
+  const termo=normalizarTexto(busca.value);
+  const status=filtroStatus.value;
+  let dados=avaliacoes.filter(a=>{
+    if(status!=='TODOS'&&a.status!==status)return false;
+    if(!termo)return true;
+    return normalizarTexto(`${a.projeto?.tema||''} ${a.projeto?.curso||''} ${a.avaliador||''} ${a.status||''}`).includes(termo);
+  });
+  dados=[...dados].sort((a,b)=>{
+    if(ordenacao.value==='NOTA_DESC')return Number(b.notaFinal||0)-Number(a.notaFinal||0);
+    if(ordenacao.value==='NOTA_ASC')return Number(a.notaFinal||0)-Number(b.notaFinal||0);
+    return new Date(b.dataAtualizacao||b.data||0)-new Date(a.dataAtualizacao||a.data||0);
+  });
+  const rascunhos=dados.filter(a=>a.status==='Em análise').length;
+  resumo.textContent=`${dados.length} avaliação(ões)${rascunhos?` · ${rascunhos} rascunho(s)`:''}`;
+  lista.innerHTML=dados.map(a=>{
+    const data=formatarData(a.dataAtualizacao||a.data);
+    return `<article class="eval-history-row"><div class="eval-history-main"><div class="eval-row-top"><span class="eval-state ${statusClass(a.status)}">${escapeHtml(statusLabel(a.status))}</span><span class="eval-score-pill">${Number(a.notaFinal||0).toFixed(1)}</span></div><h3>${escapeHtml(a.projeto?.tema||'Projeto')}</h3><p>${admin?`Avaliador: ${escapeHtml(a.avaliador||'—')} · `:''}${escapeHtml(a.projeto?.curso||'Curso')}${data?` · ${data}`:''}${a.avaliacaoAlunos?.length?` · ${a.avaliacaoAlunos.length} aluno(s) com nota individual`:''}</p></div><div class="eval-row-actions"><a class="btn ghost sm" href="projeto.html?id=${encodeURIComponent(a.projeto?.id||a.projetoId||'')}">Ver projeto</a><a class="btn sm" href="avaliacoes-editar.html?id=${encodeURIComponent(a.id)}">${a.status==='Em análise'?'Continuar':'Revisar'}</a></div></article>`;
+  }).join('')||'<div class="eval-empty">Nenhuma avaliação encontrada com esses filtros.</div>';
+}
+
+[busca,filtroStatus,ordenacao].forEach(el=>el.addEventListener(el===busca?'input':'change',render));
+api('/api/v1/avaliacoes').then(r=>{avaliacoes=r.data.avaliacoes||[];render()}).catch(e=>{mostrarAlerta(alerta,'error',e.message);lista.innerHTML='<div class="eval-empty">Não foi possível carregar as avaliações.</div>'});
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+/* Refinamento institucional — Escola / UNIVAP
+   Camada visual leve para alternar superfícies, reforçar hierarquia e manter leitura. */
+:root{
+  --school-navy:#072846;
+  --school-navy-2:#0a3b68;
+  --school-blue:#075da8;
+  --school-blue-2:#1472ca;
+  --school-sky:#eaf4fd;
+  --school-sky-2:#f4f9fd;
+  --school-red:#bd1627;
+  --school-ink:#17324f;
+  --school-muted:#667c91;
+  --school-line:#cdddea;
+  --school-white:#fff;
+}
+
+/* Base e hierarquia */
+body{
+  background:
+    radial-gradient(circle at 88% 8%,rgba(20,114,202,.045),transparent 24%),
+    linear-gradient(180deg,#f5f9fd 0%,#edf4fa 100%);
+}
+.topbar{
+  min-height:90px;
+  background:rgba(255,255,255,.96);
+  border-bottom:1px solid var(--school-line);
+}
+.topbar>div:first-child{
+  position:relative;
+  padding-left:14px;
+}
+.topbar>div:first-child::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:3px;
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--school-blue),var(--school-red));
+}
+.topbar h1{color:var(--school-navy)}
+.topbar p{color:#71869a}
+
+.main,.student-main,.badge-main,.evaluator-main{
+  max-width:1360px;
+}
+.section-title,.catalogo-head,.ranking-title,.eval-page-head,.student-card-header{
+  position:relative;
+}
+.section-title h2,.catalogo-head h2,.ranking-title h2,.eval-page-head h2{
+  color:var(--school-navy);
+}
+
+/* Navegação interna */
+.sidebar{
+  background:linear-gradient(180deg,#062744 0%,#0a3b68 68%,#0b4c84 100%);
+}
+.sidebar .nav-link{
+  border:1px solid transparent;
+  border-radius:9px;
+}
+.sidebar .nav-link:hover{
+  border-color:rgba(255,255,255,.08);
+  background:rgba(255,255,255,.09);
+}
+.sidebar .nav-link.active{
+  background:linear-gradient(90deg,#0b5eaa,#1373c8);
+  border-color:rgba(255,255,255,.1);
+  box-shadow:inset 3px 0 0 #fff,0 6px 18px rgba(1,28,53,.16);
+}
+.sidebar .profile-mini{
+  margin-top:6px;
+  padding-top:18px;
+}
+
+/* Botões e campos: azul como ação, branco como superfície, vermelho só em perigo */
+.btn,.botao,.bg.primary{
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(7,93,168,.08);
+}
+.btn:hover,.botao:hover,.bg.primary:hover{
+  box-shadow:0 6px 16px rgba(7,43,80,.12);
+}
+.btn.ghost,.btn.sec,.botao.secundario{
+  background:#fff;
+  border-color:#bfd3e4;
+  color:#315b7e;
+  box-shadow:none;
+}
+.btn.ghost:hover,.btn.sec:hover,.botao.secundario:hover{
+  background:var(--school-sky);
+  border-color:#96bddc;
+  color:var(--school-blue);
+}
+input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{
+  background:#fff;
+  border-color:#bfd0df;
+}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):hover,select:hover,textarea:hover{
+  border-color:#a7c2d8;
+}
+
+/* Cards alternam branco/azul-claro sem perder unidade */
+.card,.panel,.block,.eval-panel,.eval-section,.student-card{
+  border-color:var(--school-line);
+}
+.card,.panel,.block{
+  background:#fff;
+}
+.grid>.card:nth-child(even),
+.eval-dashboard-grid>.eval-panel:nth-child(even),
+.student-side>.student-card:nth-child(even){
+  background:linear-gradient(180deg,#f9fcff 0%,#f1f7fc 100%);
+}
+.card,.panel,.block,.eval-panel,.eval-section,.student-card,.table-wrap,.ranking-table-wrap{
+  box-shadow:0 9px 26px rgba(8,43,80,.045);
+}
+
+/* Tabelas mais escolares/institucionais */
+.table-wrap{
+  overflow:hidden;
+  border-radius:12px;
+  background:#fff;
+}
+.table-wrap thead th{
+  background:linear-gradient(180deg,#0a3c69,#082f55);
+  color:#f4f9fd;
+  border-bottom-color:#082f55;
+  font-weight:650;
+}
+.table-wrap tbody tr:nth-child(even){background:#f6fafe}
+.table-wrap tbody tr:hover{background:#eaf4fd}
+.table-wrap td{border-bottom-color:#e1ebf3}
+
+/* Alertas e estados */
+.alert.show.ok,.alert.ok{
+  border-color:#ddd6ca;
+  background:#f3f1ec;
+}
+.alert.show.error,.alert.error{
+  border-color:#ebc4ca;
+  background:#fff4f5;
+}
+.pill,.tag,.badge,.student-status,.eval-state{
+  border-radius:999px;
+}
+
+/* Página pública: cabeçalho escuro, conteúdo claro, rodapé escuro */
+.topo{
+  background:linear-gradient(90deg,#062744,#0a3d6c);
+  border-bottom:0;
+  box-shadow:0 8px 26px rgba(4,31,56,.12);
+}
+.topo .marca{color:#fff}
+.topo .marca img{
+  background:#fff;
+  padding:6px 8px;
+  border-radius:7px;
+}
+.topo .marca div{color:#fff}
+.topo .marca small{color:#c8dced}
+.topo .nav .botao.secundario{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.3);
+  color:#fff;
+}
+.topo .nav .botao.secundario:hover{
+  background:rgba(255,255,255,.15);
+  border-color:rgba(255,255,255,.46);
+}
+.topo .nav .botao:not(.secundario){
+  background:#fff;
+  color:var(--school-blue);
+  border-color:#fff;
+}
+.topo .nav .botao:not(.secundario):hover{
+  background:#eaf4fd;
+  color:var(--school-navy);
+}
+.hero{
+  background:
+    radial-gradient(circle at 80% 18%,rgba(62,151,228,.24),transparent 22%),
+    linear-gradient(135deg,#062744 0%,#0a3d6c 58%,#0c5795 100%);
+  border-bottom:4px solid var(--school-red);
+}
+.hero .selo,.detail-hero .selo,.ranking-hero .selo{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.2);
+}
+.catalogo{
+  background:linear-gradient(180deg,#fff 0%,#f4f9fd 100%);
+}
+.catalogo-head{
+  padding:20px 22px;
+  margin-bottom:14px;
+  border:1px solid #d2e1ed;
+  border-left:4px solid var(--school-blue);
+  border-radius:12px;
+  background:#fff;
+}
+.filtros{
+  padding:10px 0 16px;
+}
+.filtro.ativo{
+  background:var(--school-blue);
+  border-color:var(--school-blue);
+  color:#fff;
+}
+.card-projeto{
+  border:1px solid #cfdeea;
+  border-top:3px solid var(--school-blue);
+  background:#fff;
+}
+.card-projeto:nth-child(3n+2){border-top-color:#1d78bd}
+.card-projeto:nth-child(3n+3){border-top-color:#8eafca}
+.card-projeto:hover{
+  border-color:#a9c7de;
+  box-shadow:0 14px 34px rgba(8,43,80,.09);
+}
+.card-projeto .tag:nth-child(even){
+  background:#f2f6fa;
+  color:#526d84;
+}
+.footer{
+  background:linear-gradient(90deg,#062744,#0a3d6c);
+  color:#d6e5f1;
+  border-top:3px solid var(--school-red);
+}
+
+/* Página de projeto: blocos alternados e lateral destacada */
+.detail-hero,.ranking-hero{
+  background:linear-gradient(135deg,#072846,#0a467b);
+  border-bottom:4px solid var(--school-red);
+}
+.detail>section .block:nth-child(even){
+  background:#f5f9fd;
+}
+.detail>aside .block{
+  background:#f7fbff;
+}
+.highlight{
+  background:linear-gradient(135deg,#eaf4fd,#dcecf9);
+  border:1px solid #bdd5e7;
+  color:var(--school-navy);
+}
+
+/* Ranking: azul, branco e um toque dourado apenas no pódio */
+.ranking-main{
+  background:linear-gradient(180deg,#f4f9fd,#edf4fa);
+}
+.podium-card{
+  border-top:3px solid #86abc7;
+}
+.podium-card:first-child{
+  background:linear-gradient(180deg,#fffdf4,#fff 72%);
+  border-top-color:#d2a431;
+}
+.podium-card:nth-child(2){border-top-color:#9aacbd}
+.podium-card:nth-child(3){border-top-color:#b87b4a}
+.ranking-table-wrap{
+  background:#fff;
+}
+.ranking-row:nth-child(even){background:#f6fafe}
+.ranking-row:hover{background:#eaf4fd}
+
+/* Aluno: resumo em azul-claro, editor branco, lateral alternada */
+.project-summary{
+  background:linear-gradient(135deg,#f9fcff,#eaf4fd);
+  border-color:#c7ddeb;
+  border-left:4px solid var(--school-blue);
+}
+.project-summary-stats>div:nth-child(even){
+  background:rgba(255,255,255,.5);
+  border-radius:10px;
+  border-left:0;
+}
+.project-editor{
+  background:#fff;
+}
+.editor-block{
+  border-bottom-color:#dfeaf2;
+}
+.editor-block>h3,.editor-block-title h3{
+  position:relative;
+  padding-left:12px;
+}
+.editor-block>h3::before,.editor-block-title h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:3px;
+  bottom:3px;
+  width:3px;
+  border-radius:999px;
+  background:var(--school-blue);
+}
+.student-side .student-card:nth-child(odd){
+  background:#fff;
+}
+.student-side .student-card:nth-child(even){
+  background:linear-gradient(180deg,#f8fbfe,#edf5fb);
+}
+.optional-block{
+  background:#f7fbff;
+  border-color:#d5e4f0;
+}
+
+/* Avaliador: métricas revezam tons institucionais */
+.eval-metric{
+  border-color:#cdddea;
+}
+.eval-metric:nth-child(1){
+  background:linear-gradient(180deg,#eaf4fd,#f8fbfe);
+  border-top:3px solid var(--school-blue);
+}
+.eval-metric:nth-child(2){
+  background:#fff;
+  border-top:3px solid #80afd3;
+}
+.eval-metric:nth-child(3){
+  background:linear-gradient(135deg,#072846,#0a467b);
+  border-color:#0a467b;
+  border-top:3px solid #6bb3ed;
+}
+.eval-metric:nth-child(3) span,.eval-metric:nth-child(3) small{color:#c4dced}
+.eval-metric:nth-child(3) strong{color:#fff}
+.eval-panel-head,.eval-section-title{
+  padding-bottom:10px;
+  border-bottom:1px solid #e1ebf3;
+}
+.eval-project-row:nth-child(even),.eval-history-row:nth-child(even),.eval-task:nth-child(even){
+  background:#f6fafe;
+}
+.eval-project-row:hover,.eval-history-row:hover{
+  background:#edf6fd;
+}
+.criterion-card:nth-child(4n+2),.criterion-card:nth-child(4n+3){
+  background:#f4f9fd;
+}
+.score-summary{
+  background:linear-gradient(180deg,#f8fbff,#eaf4fd);
+  border-top:3px solid var(--school-blue);
+}
+.score-summary-value{color:var(--school-blue)}
+.eval-optional{background:#f7fbff}
+
+/* Login aprovado: só acabamento, sem mudar posição/estrutura */
+.login-page{
+  background:
+    radial-gradient(circle at 50% 16%,rgba(38,133,216,.25),transparent 28%),
+    linear-gradient(145deg,#061f3c 0%,#082f56 55%,#0a4b84 100%);
+}
+.login-card{
+  border-top:4px solid var(--school-blue);
+}
+.login-brand img{
+  border-bottom:3px solid var(--school-red);
+}
+
+/* Responsividade e ergonomia */
+@media(max-width:1000px){
+  .topbar>div:first-child{padding-left:11px}
+  .catalogo-head{padding:18px}
+  .sidebar{box-shadow:10px 0 30px rgba(4,31,56,.2)}
+}
+@media(max-width:680px){
+  body{background:#f4f8fc}
+  .topbar{min-height:76px}
+  .topbar>div:first-child::before{width:2px}
+  .catalogo-head{border-left-width:3px}
+  .eval-metric:nth-child(3){background:linear-gradient(135deg,#0a3d6c,#0b5eaa)}
+  .project-summary{border-left-width:3px}
+}

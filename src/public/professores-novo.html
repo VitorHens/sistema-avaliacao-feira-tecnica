@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Novo professor | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link  " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link active admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link  admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Novo professor</h1><p>Cadastre um acesso para a banca avaliadora.</p></div><div class="top-actions"><a class="btn ghost sm" href="professores-consulta.html">Voltar à lista</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">ORGANIZAÇÃO / ACESSOS · UNIVAP CENTRO</span><h2>Mais um olhar <em>para a feira.</em></h2><p>Preencha os dados do professor e escolha se ele avaliará projetos ou administrará o sistema.</p></div></section><div class="alert" id="alerta" role="status" aria-live="polite"></div>
+<form id="form">
+<div class="form-grid">
+<div class="field" data-professor-id><label for="identificador">ID numérico informado pela escola</label><input id="identificador" name="identificador" inputmode="numeric" pattern="[0-9]+" maxlength="64" placeholder="Ex.: 001234" required></div>
+<div class="field"><label for="nome">Nome</label><input id="nome" name="nome" minlength="3" autocomplete="name" placeholder="Nome do professor" required></div>
+<div class="field"><label for="email">E-mail (opcional para professor)</label><input id="email" name="email" placeholder="professor@escola.com" autocomplete="email" type="email"></div>
+<div class="field" data-admin-password><label for="senha">Senha do administrador</label><input id="senha" name="senha" minlength="8" maxlength="72" autocomplete="new-password" type="password"></div>
+<div class="field" data-admin-password><label for="confirmarSenha">Confirme a senha</label><input id="confirmarSenha" name="confirmarSenha" minlength="8" maxlength="72" autocomplete="new-password" type="password"></div>
+<div class="field"><label for="role">Função</label><select id="role" name="role"><option value="AVALIADOR">Professor avaliador</option><option value="ADMINISTRADOR">Administrador</option></select></div>
+</div>
+<p class="help" id="ajudaAcesso">Informe o ID oficial do professor usando somente números. Ele entrará com esse ID e senha inicial univap.</p>
+<div class="form-actions"><button class="btn ok" type="submit">Cadastrar professor</button><a class="btn light" href="professores-consulta.html">Cancelar</a></div>
+</form></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script>
+
+const form = document.getElementById("form");
+const alerta = document.getElementById("alerta");
+if (SESSAO.role !== 'ADMINISTRADOR') location.replace('dashboard.html');
+function atualizarCamposSenha(){
+  const admin=form.elements.role.value==='ADMINISTRADOR';
+  document.querySelector('[data-professor-id]').hidden=admin;
+  form.elements.identificador.required=!admin;
+  form.elements.email.required=admin;
+  document.querySelectorAll('[data-admin-password]').forEach(el=>el.hidden=!admin);
+  form.elements.senha.required=admin;
+  form.elements.confirmarSenha.required=admin;
+  document.getElementById('ajudaAcesso').textContent=admin
+    ?'O administrador entra pelo e-mail e por uma senha forte própria.'
+    :'Informe o ID oficial do professor usando somente números. Ele entrará com esse ID e senha inicial univap.';
+}
+form.elements.role.addEventListener('change',atualizarCamposSenha);
+atualizarCamposSenha();
+form.addEventListener("submit", async e => {
+  e.preventDefault(); limparAlerta(alerta);
+  try {
+    if (form.elements.role.value==='ADMINISTRADOR' && form.elements.senha.value !== form.elements.confirmarSenha.value) {
+      throw new Error('As senhas informadas não coincidem.');
+    }
+    const professor = {
+      nome: form.elements.nome.value.trim(), email: form.elements.email.value.trim(),
+      ...(form.elements.role.value==='AVALIADOR'?{identificador:form.elements.identificador.value.trim()}:{}),
+      ...(form.elements.role.value==='ADMINISTRADOR'?{senha:form.elements.senha.value}:{}), role: form.elements.role.value
+    };
+    const r = await api("/api/v1/professores", { method:"POST", body:JSON.stringify({ professor }) });
+    mostrarAlerta(alerta, "ok", form.elements.role.value==='AVALIADOR'
+      ?`✓ ${r.message}. ID de acesso: ${r.data.professor.identificador}`
+      :`✓ ${r.message}. Acesso por e-mail: ${r.data.professor.email}`);
+    form.reset();
+    atualizarCamposSenha();
+  } catch (e) { mostrarAlerta(alerta, "error", e.message); }
+});
+
+</script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

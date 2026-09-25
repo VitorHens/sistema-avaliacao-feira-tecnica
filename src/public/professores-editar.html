@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Editar professor | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link  " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link active admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link  admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Editar professor</h1><p>Atualize os dados de um professor.</p></div><div class="top-actions"><a class="btn ghost sm" href="dashboard.html">Painel</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">ORGANIZAÇÃO / ACESSOS · UNIVAP CENTRO</span><h2>Uma equipe <em>bem conectada.</em></h2><p>Mantenha os dados e as permissões do professor atualizados.</p></div></section><div class="alert" id="alerta"></div>
+<form id="form">
+<fieldset><legend>Selecionar</legend><div class="field"><label>Professor</label><select id="professorId" required=""><option value="">Carregando...</option></select></div></fieldset>
+<div class="form-grid">
+<div class="field"><label for="identificador">ID numérico de acesso do professor</label><input id="identificador" inputmode="numeric" pattern="[0-9]+" maxlength="64" placeholder="ID informado pela escola"/></div>
+<div class="field"><label>Nome</label><input id="nome" minlength="3" required=""/></div>
+<div class="field"><label>E-mail (obrigatório para administrador)</label><input id="email" type="email"/></div>
+<div class="field"><label>Nova senha</label><input id="senha" placeholder="Opcional, exceto ao promover a administrador" type="password"/></div>
+<div class="field"><label>Função</label><select id="role"><option>AVALIADOR</option><option>ADMINISTRADOR</option></select></div>
+</div>
+<p class="help">Ao promover um avaliador a administrador, informe uma senha forte. Ao mudar um administrador para avaliador, a senha inicial passa a ser univap e o acesso será pelo ID.</p>
+<div class="form-actions"><button class="btn sec" type="submit">Salvar alterações</button></div>
+</form></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script>
+
+const alerta=document.getElementById("alerta"), sel=document.getElementById("professorId");
+let lista=[];
+async function carregarLista(){
+  try{
+    const r=await api("/api/v1/professores"); lista=r.data.professores||[];
+    sel.innerHTML='<option value="">Selecione...</option>'+lista.map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.nome)} — ${escapeHtml(p.identificador||p.email||'sem ID')}</option>`).join("");
+    const q=new URLSearchParams(location.search).get("id"); if(q){sel.value=q; preencher();}
+  }catch(e){mostrarAlerta(alerta,"error",e.message);}
+}
+function preencher(){
+  const p=lista.find(x=>x.id===sel.value); if(!p)return;
+  nome.value=p.nome||""; email.value=p.email||""; identificador.value=p.identificador||""; role.value=p.role||"AVALIADOR"; senha.value="";
+}
+sel.addEventListener("change",preencher);
+document.getElementById("form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!sel.value) return mostrarAlerta(alerta,"error","Selecione um professor.");
+  const professor={nome:nome.value.trim(),email:email.value.trim(),identificador:identificador.value.trim(),role:role.value};
+  if(senha.value) professor.senha=senha.value;
+  try{
+    const r=await api(`/api/v1/professores/${sel.value}`,{method:"PUT",body:JSON.stringify({professor})});
+    mostrarAlerta(alerta,"ok",`✓ ${r.message}`);
+    await carregarLista(); sel.value=r.data.professor?.id||sel.value; preencher();
+  }catch(e){mostrarAlerta(alerta,"error",e.message);}
+});
+carregarLista();
+
+</script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

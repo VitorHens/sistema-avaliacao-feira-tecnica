@@ -1,98 +1,50 @@
-<!doctype html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Projeto - Feira Técnica</title>
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Projeto | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
 </head>
-<body class="bg-light">
-  <div class="container py-5" style="max-width: 700px;">
-    <div id="carregando" class="text-center text-muted">Carregando projeto...</div>
-    <div id="erro" class="alert alert-danger d-none"></div>
-
-    <div id="conteudo" class="card shadow-sm d-none">
-      <div class="card-body">
-        <h2 id="tema" class="card-title mb-3"></h2>
-
-        <p><strong>Curso:</strong> <span id="curso"></span></p>
-        <p><strong>Equipamento:</strong> <span id="equipamento"></span></p>
-
-        <hr>
-
-        <h5>Representante</h5>
-        <p id="representante" class="mb-3"></p>
-
-        <h5>Integrantes</h5>
-        <p id="integrantes" class="mb-3"></p>
-
-        <div id="outrosRecursosBox" class="d-none">
-          <h5>Outros recursos</h5>
-          <p id="outrosRecursos"></p>
-        </div>
-
-        <div id="observacoesBox" class="d-none">
-          <h5>Observações</h5>
-          <p id="observacoes"></p>
-        </div>
-      </div>
-    </div>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<header class="topo">
+  <div class="container topo-inner">
+    <a class="marca" href="index.html">
+      <img src="imagens/logo.png" alt="UNIVAP">
+      <div>Feira Técnica<small>Mostra de Projetos 2026</small></div>
+    </a>
+    <nav class="nav">
+      <a class="botao secundario" href="ranking.html">Ranking</a>
+      <a class="botao secundario" href="index.html">Todos os projetos</a>
+      <a class="botao" href="login.html">Entrar</a>
+    </nav>
   </div>
+</header>
 
-  <script>
-    const idProjeto = new URLSearchParams(window.location.search).get("id");
+<section class="detail-hero">
+  <div class="container">
+    <a class="breadcrumb" href="index.html">← Voltar para a vitrine</a>
+    <div id="hero"><span class="selo">Carregando projeto...</span><h1>Projeto</h1></div>
+  <div class="public-tools"><button id="shareProject" class="btn" type="button" hidden>Compartilhar projeto ↗</button><a class="btn" href="#principal">Conhecer a ideia ↓</a><a class="btn" href="#avaliacao-publico">Avaliar como visitante ↓</a><span id="shareStatus" role="status" aria-live="polite"></span></div></div>
+</section>
 
-    const elCarregando = document.getElementById("carregando");
-    const elErro = document.getElementById("erro");
-    const elConteudo = document.getElementById("conteudo");
+<main id="conteudo" class="container detail">
+  <section id="principal" aria-live="polite" aria-busy="true"><div class="block">Carregando informações...</div></section>
+  <aside id="lateral"></aside>
+</main>
 
-    const mostrarErro = (mensagem) => {
-      elCarregando.classList.add("d-none");
-      elErro.textContent = mensagem;
-      elErro.classList.remove("d-none");
-    };
+<footer class="footer"><div class="container">Feira Técnica 2026 · Página pública do projeto.</div></footer>
 
-    if (!idProjeto) {
-      mostrarErro("Nenhum projeto informado na URL.");
-    } else {
-      fetch(`/api/v1/projetos/publico/${idProjeto}`)
-        .then(async (resposta) => {
-          const json = await resposta.json();
-
-          if (!resposta.ok || !json.success) {
-            throw new Error(json.message || "Projeto não encontrado.");
-          }
-
-          return json.data.projeto;
-        })
-        .then((projeto) => {
-          document.getElementById("tema").textContent = projeto.tema;
-          document.getElementById("curso").textContent = projeto.curso;
-          document.getElementById("equipamento").textContent = projeto.equipamento;
-
-          document.getElementById("representante").textContent =
-            `${projeto.representante.nome} (${projeto.representante.turma})`;
-
-          document.getElementById("integrantes").textContent =
-            projeto.integrantes.length
-              ? projeto.integrantes.map(i => `${i.nome} (${i.turma})`).join(", ")
-              : "Nenhum integrante além do representante.";
-
-          if (projeto.outrosRecursos) {
-            document.getElementById("outrosRecursos").textContent = projeto.outrosRecursos;
-            document.getElementById("outrosRecursosBox").classList.remove("d-none");
-          }
-
-          if (projeto.observacoes) {
-            document.getElementById("observacoes").textContent = projeto.observacoes;
-            document.getElementById("observacoesBox").classList.remove("d-none");
-          }
-
-          elCarregando.classList.add("d-none");
-          elConteudo.classList.remove("d-none");
-        })
-        .catch((erro) => mostrarErro(erro.message));
-    }
-  </script>
+<script src="js/public-utils.js"></script>
+<script src="js/visitor-rating.js"></script><script src="js/projeto-publico.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
 </body>
 </html>

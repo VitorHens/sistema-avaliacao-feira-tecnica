@@ -1,43 +1,187 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
   <title>Painel | Feira Técnica</title>
-  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/evaluator.css">
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
 </head>
-<body class="bg-light">
-  <nav class="navbar navbar-dark bg-primary shadow-sm">
-    <div class="container">
-      <span class="navbar-brand fw-semibold">🎓 Feira Técnica</span>
-      <button id="sair" class="btn btn-outline-light" type="button">Sair</button>
-    </div>
-  </nav>
+<body class="evaluator-area experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small id="sideRole">Avaliação</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link active" href="dashboard.html"><span class="ico">⌂</span>Painel</a>
+      <a class="nav-link" href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a>
+      <a class="nav-link" href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a>
+      <a class="nav-link" href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">↗</span>Ranking</a>
+      <a class="nav-link admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar planilha</a>
+      <a class="nav-link admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a>
+      <a class="nav-link admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span id="profileRole">Avaliador</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
 
-  <main class="container py-5">
-    <div class="p-4 p-md-5 bg-white rounded-4 shadow-sm">
-      <p class="text-primary fw-semibold mb-2">PAINEL DO PROFESSOR</p>
-      <h1 id="boasVindas" class="display-6 fw-bold">Bem-vindo!</h1>
-      <p class="lead text-secondary mb-0">Use o sistema para acompanhar os projetos e registrar avaliações da Feira Técnica.</p>
-    </div>
-  </main>
+  <div class="content">
+    <header class="topbar">
+      <div><h1 id="topTitle">Painel do avaliador</h1><p id="welcome">Feira Técnica 2026</p></div>
+      <div class="top-actions"><a class="btn ghost sm" href="#segurancaConta" id="abrirSeguranca">Trocar senha</a><a class="btn ghost sm" href="index.html">Vitrine</a><a class="btn sm" href="avaliacoes-cadastro.html">Nova avaliação</a></div>
+    </header>
 
-  <script>
-    const authData = JSON.parse(localStorage.getItem('authData') || 'null');
-    const token = localStorage.getItem('token');
+    <main id="conteudo" class="evaluator-main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">01 / ORGANIZAR · UNIVAP CENTRO</span><h2>Toda descoberta merece <em>um bom olhar.</em></h2><p>Acompanhe os projetos, retome avaliações e encontre a próxima equipe.</p></div></section>
+      <div id="alerta" class="alert" role="status" aria-live="polite"></div>
 
-    if (!authData || !token) {
-      window.location.replace('/');
-    } else {
-      const nome = authData.professor?.nome || authData.professor?.name || 'Professor';
-      document.getElementById('boasVindas').textContent = `Bem-vindo, ${nome}!`;
+      <header class="eval-page-head">
+        <div><h2 id="pageHeading">Fila de avaliação</h2><p id="pageDescription">Veja o que falta avaliar e retome rapidamente as avaliações já registradas.</p></div>
+        <div class="eval-head-actions"><a class="btn ghost" href="projetos-consulta.html">Todos os projetos</a><a class="btn" href="avaliacoes-cadastro.html">Avaliar projeto</a></div>
+      </header>
+
+      <section class="eval-metrics">
+        <article class="eval-metric"><span id="labelMetric1">Pendentes</span><strong id="mPendentes">—</strong><small id="subMetric1">projetos para avaliar</small></article>
+        <article class="eval-metric"><span id="labelMetric2">Minhas avaliações</span><strong id="mMinhas">—</strong><small id="subMetric2">registradas</small></article>
+        <article class="eval-metric"><span id="labelMetric3">Média das notas</span><strong id="mMedia">—</strong><small id="subMetric3">nas avaliações concluídas</small></article>
+      </section>
+
+      <details class="eval-panel account-security" id="segurancaConta">
+        <summary>Segurança da conta · Trocar senha</summary>
+        <p id="avisoSenhaProfessor">Crie uma senha pessoal para proteger suas avaliações.</p>
+        <form id="formSenhaProfessor" class="account-security-form">
+          <div class="field"><label for="senhaAtualProfessor">Senha atual</label><input id="senhaAtualProfessor" type="password" autocomplete="current-password" required></div>
+          <div class="field"><label for="novaSenhaProfessor">Nova senha</label><input id="novaSenhaProfessor" type="password" autocomplete="new-password" minlength="8" required aria-describedby="regraSenhaProfessor"></div>
+          <div class="field"><label for="confirmarSenhaProfessor">Confirmar nova senha</label><input id="confirmarSenhaProfessor" type="password" autocomplete="new-password" minlength="8" required></div>
+          <small id="regraSenhaProfessor">Use ao menos 8 caracteres, com maiúscula, minúscula, número e símbolo.</small>
+          <button class="btn" type="submit">Salvar nova senha</button>
+          <p id="estadoSenhaProfessor" role="status" aria-live="polite"></p>
+        </form>
+      </details>
+
+      <div class="eval-dashboard-grid">
+        <section class="eval-panel">
+          <div class="eval-panel-head"><div><h3 id="queueTitle">Próximos projetos</h3><p id="queueDescription">Projetos que ainda não têm uma avaliação sua.</p></div><a class="btn ghost sm" href="projetos-consulta.html">Ver todos</a></div>
+          <div id="fila" class="eval-stack"><div class="eval-empty">Carregando projetos...</div></div>
+        </section>
+
+        <section class="eval-panel">
+          <div class="eval-panel-head"><div><h3 id="recentTitle">Avaliações recentes</h3><p id="recentDescription">Continue uma análise ou revise uma nota.</p></div><a class="btn ghost sm" href="avaliacoes-consulta.html">Histórico</a></div>
+          <div id="recentes" class="eval-stack"><div class="eval-empty">Carregando avaliações...</div></div>
+        </section>
+      </div>
+
+      <section id="adminTools" class="eval-panel" style="margin-top:16px" hidden>
+        <div class="eval-panel-head"><div><h3>Administração</h3><p>Ferramentas usadas para preparar os dados da feira.</p></div></div>
+        <div class="eval-head-actions"><a class="btn ghost" href="receberExcel.html">Importar planilha</a><a class="btn ghost" href="professores-consulta.html">Professores</a><a class="btn ghost" href="alunos-consulta.html">Alunos</a><a class="btn ghost" href="qrcodes.html">Buscar QR Code</a></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="mobile-nav" aria-label="Navegação rápida">
+  <a class="active" href="dashboard.html"><strong>⌂</strong><span>Painel</span></a>
+  <a href="projetos-consulta.html"><strong>◇</strong><span>Projetos</span></a>
+  <a href="avaliacoes-cadastro.html"><strong>★</strong><span>Avaliar</span></a>
+  <a href="avaliacoes-consulta.html"><strong>✓</strong><span>Histórico</span></a>
+</nav>
+
+<script src="js/auth.js"></script>
+<script>
+(async()=>{
+  if(SESSAO.role==='ALUNO'){location.replace('aluno.html');return}
+  const admin=SESSAO.role==='ADMINISTRADOR';
+  const nome=SESSAO.usuario.nome||'Professor';
+  document.getElementById('profileRole').textContent=admin?'Administrador':'Professor avaliador';
+  document.getElementById('sideRole').textContent=admin?'Administração':'Avaliação';
+  document.getElementById('topTitle').textContent=admin?'Painel administrativo':'Painel do avaliador';
+  document.getElementById('welcome').textContent=`Olá, ${nome.split(' ')[0]}.`;
+  document.getElementById('adminTools').hidden=!admin;
+  const seguranca=document.getElementById('segurancaConta');
+  const estadoSenha=document.getElementById('estadoSenhaProfessor');
+  if(SESSAO.usuario.deveTrocarSenha){
+    seguranca.open=true;
+    document.getElementById('avisoSenhaProfessor').textContent='Você está usando a senha inicial da escola. Troque-a por uma senha pessoal antes de avaliar projetos.';
+  }
+  document.getElementById('abrirSeguranca').addEventListener('click',()=>{seguranca.open=true});
+  document.getElementById('formSenhaProfessor').addEventListener('submit',async event=>{
+    event.preventDefault();
+    const form=event.currentTarget;
+    const button=form.querySelector('button[type="submit"]');
+    const current=document.getElementById('senhaAtualProfessor').value;
+    const next=document.getElementById('novaSenhaProfessor').value;
+    if(next!==document.getElementById('confirmarSenhaProfessor').value){
+      estadoSenha.textContent='As novas senhas não coincidem.';
+      return;
+    }
+    button.disabled=true;
+    estadoSenha.textContent='Salvando...';
+    try{
+      await api('/api/v1/professores/me/senha',{method:'PUT',body:JSON.stringify({senhaAtual:current,novaSenha:next})});
+      form.reset();
+      SESSAO.usuario.deveTrocarSenha=false;
+      try{
+        const stored=JSON.parse(localStorage.getItem('userData')||'null');
+        if(stored?.data?.professor){stored.data.professor.deveTrocarSenha=false;localStorage.setItem('userData',JSON.stringify(stored))}
+      }catch(_){/* A senha já foi salva no servidor; o estado será atualizado no próximo login. */}
+      document.getElementById('avisoSenhaProfessor').textContent='Sua senha pessoal está ativa.';
+      estadoSenha.textContent='Senha alterada com sucesso.';
+    }catch(error){estadoSenha.textContent=error.message||'Não foi possível trocar a senha.'}
+    finally{button.disabled=false}
+  });
+
+  if(admin){
+    document.getElementById('pageHeading').textContent='Visão geral da feira';
+    document.getElementById('pageDescription').textContent='Acompanhe projetos e avaliações e acesse as ferramentas administrativas quando necessário.';
+    document.getElementById('labelMetric1').textContent='Projetos sem avaliação';
+    document.getElementById('subMetric1').textContent='ainda sem nota da banca';
+    document.getElementById('labelMetric2').textContent='Avaliações';
+    document.getElementById('subMetric2').textContent='registradas no sistema';
+    document.getElementById('labelMetric3').textContent='Projetos';
+    document.getElementById('subMetric3').textContent='cadastrados na feira';
+    document.getElementById('queueTitle').textContent='Projetos sem avaliação';
+    document.getElementById('queueDescription').textContent='Projetos que ainda não receberam nenhuma avaliação.';
+    document.getElementById('recentTitle').textContent='Últimas avaliações';
+    document.getElementById('recentDescription').textContent='Registros recentes da banca.';
+  }
+
+  const alerta=document.getElementById('alerta');
+  try{
+    const [rp,ra]=await Promise.all([api('/api/v1/projetos'),api('/api/v1/avaliacoes')]);
+    const projetos=rp.data.projetos||[];
+    const avaliacoes=ra.data.avaliacoes||[];
+    const minhas=admin?avaliacoes:avaliacoes.filter(a=>a.avaliador===nome);
+    const avaliadosIds=new Set((admin?avaliacoes:minhas).map(a=>a.projeto?.id||a.projetoId).filter(Boolean));
+    const pendentes=projetos.filter(p=>!avaliadosIds.has(p.id));
+
+    document.getElementById('mPendentes').textContent=pendentes.length;
+    document.getElementById('mMinhas').textContent=admin?avaliacoes.length:minhas.length;
+    if(admin){
+      document.getElementById('mMedia').textContent=projetos.length;
+    }else{
+      const finais=minhas.filter(a=>a.status!=='Em análise'&&Number.isFinite(Number(a.notaFinal)));
+      document.getElementById('mMedia').textContent=finais.length?(finais.reduce((s,a)=>s+Number(a.notaFinal),0)/finais.length).toFixed(1).replace('.',','):'—';
     }
 
-    document.getElementById('sair').addEventListener('click', () => {
-      localStorage.removeItem('authData');
-      localStorage.removeItem('token');
-      window.location.replace('/');
-    });
-  </script>
+    const fila=document.getElementById('fila');
+    fila.innerHTML=pendentes.slice(0,6).map(p=>`<article class="eval-task"><div class="eval-task-main"><strong>${escapeHtml(p.tema)}</strong><span>${escapeHtml(p.curso||'Curso')}${p.localizacao?` · ${escapeHtml(p.localizacao)}`:''}</span></div><div class="eval-task-actions"><a class="btn sm" href="avaliacoes-cadastro.html?projeto=${encodeURIComponent(p.id)}">Avaliar</a></div></article>`).join('')||'<div class="eval-empty">Nenhum projeto pendente neste momento.</div>';
+
+    const recentes=[...minhas].sort((a,b)=>new Date(b.dataAtualizacao||b.data||0)-new Date(a.dataAtualizacao||a.data||0)).slice(0,5);
+    document.getElementById('recentes').innerHTML=recentes.map(a=>`<article class="eval-task"><div class="eval-task-main"><strong>${escapeHtml(a.projeto?.tema||'Projeto')}</strong><span>${admin?`${escapeHtml(a.avaliador||'Avaliador')} · `:''}${escapeHtml(a.status||'Em análise')}</span></div><div class="eval-task-actions"><span class="eval-score-pill">${Number(a.notaFinal||0).toFixed(1)}</span><a class="btn ghost sm" href="avaliacoes-editar.html?id=${encodeURIComponent(a.id)}">Revisar</a></div></article>`).join('')||'<div class="eval-empty">Nenhuma avaliação registrada ainda.</div>';
+  }catch(e){
+    mostrarAlerta(alerta,'error',e.message);
+    document.getElementById('fila').innerHTML='<div class="eval-empty">Não foi possível carregar os projetos.</div>';
+    document.getElementById('recentes').innerHTML='<div class="eval-empty">Não foi possível carregar as avaliações.</div>';
+  }
+})();
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
 </body>
 </html>

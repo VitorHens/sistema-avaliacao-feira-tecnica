@@ -1,0 +1,120 @@
+.stand-preview {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:24px
+}
+.stand-face {
+    background:white;
+    border:1px solid var(--line);
+    border-top:6px solid var(--blue);
+    padding:32px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center
+}
+.stand-face>img:first-child {
+    width:150px;
+    margin-bottom:20px
+}
+.stand-face h2 {
+    font-size:1.5rem;
+    max-width:450px;
+    margin:16px 0
+}
+.stand-face .eyebrow {
+    margin:0;
+    color:var(--muted)
+}
+.stand-face img[data-qr-imagem] {
+    width:180px;
+    height:180px;
+    margin:12px auto
+}
+.stand-face p {
+    color:var(--muted);
+    font-size:.85rem
+}
+.stand-face small {
+    font-size:.65rem;
+    color:var(--muted)
+}
+.qr-result code {
+    font-size:.78rem
+}
+.print-help {
+    margin-top:20px;
+    color:var(--muted);
+    font-size:.83rem
+}
+@media(max-width:700px) {
+    .stand-preview {
+        grid-template-columns:1fr
+    }
+    .stand-face:last-child {
+        display:none
+    }
+}
+@media print {
+    @page {
+        size:A4 portrait;
+        margin:0
+    }
+    html,body {
+        margin:0;
+        background:white
+    }
+    .sidebar,.topbar,.mobile-nav,.skip-link,.qr-controls,.qr-actions,#enderecoQr,.print-help,.ui-sidebar-overlay {
+        display:none!important
+    }
+    .shell,.content,.main,#resultadoQr {
+        display:block!important;
+        margin:0!important;
+        padding:0!important;
+        width:210mm!important;
+        max-width:none!important;
+        border:0!important
+    }
+    .stand-preview {
+        display:grid!important;
+        grid-template-columns:210mm;
+        grid-template-rows:148.5mm 148.5mm;
+        gap:0;
+        margin:0
+    }
+    .stand-face {
+        display:flex!important;
+        width:210mm;
+        height:148.5mm;
+        border:0;
+        padding:12mm;
+        break-inside:avoid;
+        print-color-adjust:exact;
+        -webkit-print-color-adjust:exact
+    }
+    .stand-face:first-child {
+        transform:rotate(180deg);
+        border-top:1px solid #ccc
+    }
+    .stand-face h2 {
+        font-size:22pt;
+        margin:8mm 0 2mm
+    }
+    .stand-face img[data-qr-imagem] {
+        width:44mm;
+        height:44mm;
+        margin:3mm
+    }
+    .stand-face>img:first-child {
+        width:38mm;
+        margin-bottom:4mm
+    }
+    .stand-face p {
+        margin:2mm
+    }
+    .stand-face small {
+        font-size:8pt
+    }
+}

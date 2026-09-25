@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Importar Projetos | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+</head>
+<body class="page-enter">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <!-- BARRA LATERAL (MENU) -->
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small id="sideRole">Administração</small></div></div>
+    <nav class="nav-list">
+      <a class="nav-link" href="dashboard.html"><span class="ico">⌂</span>Painel</a>
+      <a class="nav-link" href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a>
+      <a class="nav-link" href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a>
+      <a class="nav-link" href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a>
+      <a class="nav-link" href="ranking.html"><span class="ico">↗</span>Ranking</a>
+      <a class="nav-link active" data-admin href="receberExcel.html"><span class="ico">⇩</span>Importar planilha</a>
+      <a class="nav-link" data-admin href="professores-consulta.html"><span class="ico">♙</span>Professores</a>
+      <a class="nav-link" data-admin href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a>
+    </nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span id="profileRole">Administrador</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="content">
+    <header class="topbar">
+      <div><h1>Importar Projetos</h1><p>Feira Técnica 2026</p></div>
+      <div class="top-actions"><a class="btn ghost sm" href="index.html">Vitrine</a><button class="btn sm" data-sair>Sair</button></div>
+    </header>
+
+    <main id="conteudo" class="main">
+      <div class="section-title"><div><span class="eyebrow">Organização da feira</span><h2>Do formulário para a feira.</h2><p>Importe os dados oficiais uma vez. As equipes completam a apresentação depois.</p></div></div>
+      <div class="card">
+        <label class="upload-area" for="arquivoCsv"><strong>Selecione a planilha de projetos</strong><span>Arquivo CSV exportado do Excel, separado por vírgulas ou ponto e vírgula.</span><small>Confira o modelo antes de importar.</small><span id="nomeArquivo" hidden></span></label>
+        <input
+            type="file"
+            id="arquivoCsv"
+            accept=".csv"
+            aria-label="Selecionar planilha CSV"
+        >
+        <div class="import-actions"><a href="modelo-planilha-feira.csv" download>Baixar modelo da planilha ↓</a><button class="btn" id="btnEnviar">Importar projetos</button></div>
+      </div>
+      <section class="log-container" aria-label="Resultado da importação"><div class="log-heading"><span>Resultado da importação</span><span id="statusContador">Aguardando arquivo</span></div><div id="log" class="import-log" role="log" aria-live="polite">Aguardando o envio do arquivo para iniciar o processamento...</div></section>
+    </main>
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/csv.js"></script>
+<script>
+  if (SESSAO.role !== "ADMINISTRADOR") {
+      alert("A importação da planilha é exclusiva da organização/administrador.");
+      location.replace("dashboard.html");
+  }
+
+  const API_URL = "/api/v1/projetos";
+  const arquivoInput = document.getElementById("arquivoCsv");
+  const btnEnviar = document.getElementById("btnEnviar");
+  const log = document.getElementById("log");
+  const nomeArquivoDiv = document.getElementById("nomeArquivo");
+  const statusContador = document.getElementById("statusContador");
+
+  arquivoInput.addEventListener("change", () => {
+      if (arquivoInput.files.length > 0) {
+          nomeArquivoDiv.textContent =
+              `📌 Arquivo selecionado: ${arquivoInput.files[0].name}`;
+          nomeArquivoDiv.hidden = false;
+      } else {
+          nomeArquivoDiv.hidden = true;
+      }
+  });
+
+  function escreverLog(mensagem, tipo = "") {
+      if (log.innerHTML.includes("Aguardando o envio")) {
+          log.innerHTML = "";
+      }
+
+      const linha = document.createElement("div");
+      linha.style.marginBottom = "4px";
+
+      if (tipo === "sucesso") {
+          linha.style.color = "#216448";
+          linha.style.fontWeight = "bold";
+      }
+
+      if (tipo === "erro") {
+          linha.style.color = "#a01829";
+          linha.style.fontWeight = "bold";
+      }
+
+      if (tipo === "info") {
+          linha.style.color = "#00549d";
+      }
+
+      linha.textContent = mensagem;
+      log.appendChild(linha);
+      log.scrollTop = log.scrollHeight;
+  }
+
+  const csvParaObjetos = FeiraCSV.parseCSV;
+  function montarProjeto(linha) {
+
+      if (Object.prototype.hasOwnProperty.call(linha,'tema')) {
+          const integrantes=[];
+          for(let i=2;i<=10;i++) {
+              const nome=linha[`integrante${i}_nome`] || linha[`integrante_${i}_nome`];
+              if(nome) integrantes.push({nome,matricula:linha[`integrante${i}_matricula`] || linha[`integrante_${i}_matricula`] || '',turma:linha[`integrante${i}_turma`] || linha[`integrante_${i}_turma`] || ''});
+          }
+          return {projeto:{tema:linha.tema,curso:linha.curso,representante:{nome:linha.representante_nome,matricula:linha.representante_matricula,email:linha.representante_email,turma:linha.representante_turma},integrantes,equipamento:linha.equipamento || 'EQUIPE TRAZ SEU COMPUTADOR'}};
+      }
+
+      const integrantes = [];
+      for (let i = 2; i <= 10; i++) {
+
+          const nome =
+              linha[`nome completo aluno ${i}`] || "";
+
+          const matricula =
+              linha[`matrícula aluno ${i}`] || "";
+
+          const turma =
+              linha[`turma aluno ${i}`] || "";
+
+          if (nome || matricula || turma) {
+              integrantes.push({
+                  nome: nome,
+                  matricula: matricula,
+                  turma: turma
+              });
+          }
+      }
+
+      return {
+          projeto: {
+
+              tema: linha['tema do projeto da feira'],
+
+              curso: linha['curso'],
+
+              equipamento:
+                  linha['equipamento que usará'] ||
+                  "EQUIPE TRAZ SEU COMPUTADOR",
+
+              outrosRecursos:
+                  linha['o que a equipe precisa além de mesas (bancadas) e cadeiras? (não aplicada aos 3ºs anos)'] || "",
+
+              observacoes:
+                  linha['observações'] || "",
+
+              representante: {
+                  nome: linha['nome completo aluno 1 (representante da equipe)'],
+                  matricula: linha['matrícula do aluno 1 - representante da equipe'],
+                  email: linha['e-mail do aluno representante da equipe'],
+                  turma: linha['turma aluno 1 (representante da equipe)']
+              },
+
+              integrantes: integrantes
+          }
+      };
+  }
+
+  async function enviarProjeto(projeto) {
+      return await window.api(API_URL, {
+          method: "POST",
+          body: JSON.stringify(projeto)
+      });
+  }
+
+  async function lerCsvComEncoding(arquivo) {
+
+      const buffer = await arquivo.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+
+      try {
+
+          return new TextDecoder("utf-8", {
+              fatal: true
+          }).decode(bytes);
+
+      } catch (_) {
+
+          return new TextDecoder("windows-1252")
+              .decode(bytes);
+      }
+  }
+
+  btnEnviar.addEventListener("click", async () => {
+
+      const arquivo = arquivoInput.files[0];
+
+      if (!arquivo) {
+
+          log.innerHTML = "";
+
+          escreverLog(
+              "⚠ Selecione um arquivo CSV antes de continuar.",
+              "erro"
+          );
+
+          return;
+      }
+
+      log.innerHTML = "";
+
+      btnEnviar.disabled = true;
+
+      statusContador.textContent = "Processando...";
+
+      try {
+
+          escreverLog(
+              `Lendo arquivo: ${arquivo.name}`,
+              "info"
+          );
+
+          const conteudo =
+              await lerCsvComEncoding(arquivo);
+
+          const linhas =
+              csvParaObjetos(conteudo);
+
+          escreverLog(
+              `Total de registros: ${linhas.length} projetos encontrados.`,
+              "info"
+          );
+
+          let sucessos = 0;
+          let erros = 0;
+
+
+          for (let i = 0; i < linhas.length; i++) {
+
+              const projeto =
+                  montarProjeto(linhas[i]);
+
+              statusContador.textContent =
+                  `Enviando: ${i + 1}/${linhas.length}`;
+
+              escreverLog(
+                  `Enviando [${i + 1}/${linhas.length}]: ` +
+                  `${projeto.projeto.tema || "Sem tema"}`
+              );
+
+              try {
+
+                  await enviarProjeto(projeto);
+
+                  escreverLog(
+                      `✓ Projeto ${i + 1} enviado com sucesso.`,
+                      "sucesso"
+                  );
+
+                  sucessos++;
+
+              } catch (erro) {
+
+                  escreverLog(
+                      `✗ Erro no projeto ${i + 1}: ${erro.message}`,
+                      "erro"
+                  );
+
+                  erros++;
+              }
+          }
+
+          escreverLog(
+              `Processamento finalizado: ` +
+              `${sucessos} com sucesso, ${erros} falhas.`,
+              "info"
+          );
+
+          statusContador.textContent = "Concluído";
+
+      } catch (erro) {
+
+          escreverLog(
+              `Erro no arquivo: ${erro.message}`,
+              "erro"
+          );
+
+          statusContador.textContent =
+              "Erro no arquivo";
+
+      } finally {
+
+          btnEnviar.disabled = false;
+      }
+  });
+</script>
+
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+</body>
+</html>

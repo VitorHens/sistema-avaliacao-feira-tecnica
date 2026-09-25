@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cadastrar aluno | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link  " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link  admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link active admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Cadastrar aluno</h1><p>Crie um acesso para um aluno.</p></div><div class="top-actions"><a class="btn ghost sm" href="dashboard.html">Painel</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">ORGANIZAÇÃO / ESTUDANTES · UNIVAP CENTRO</span><h2>O próximo capítulo <em>é do aluno.</em></h2><p>Os acessos dos estudantes acompanham os dados oficiais de suas equipes.</p></div></section><div class="section-title">
+<div>
+<h2>Dados do aluno</h2>
+<p>Use uma senha temporária segura e entregue ao estudante.</p>
+</div>
+</div>
+<div class="alert" id="alerta"></div>
+<form class="panel" id="form">
+<div class="form-grid">
+<div class="field">
+<label for="nome">Nome</label>
+<input id="nome" minlength="3" required=""/>
+</div>
+<div class="field">
+<label for="email">E-mail</label>
+<input id="email" required="" type="email"/>
+</div>
+<div class="field">
+<label for="matricula">Matrícula</label>
+<input id="matricula" required=""/>
+</div>
+<div class="field">
+<label for="turma">Turma</label>
+<input id="turma" placeholder="2INFO" required=""/>
+</div>
+<div class="field">
+<label for="curso">Curso</label>
+<select id="curso">
+<option>INFORMÁTICA</option>
+<option>ADMINISTRAÇÃO</option>
+<option>ANÁLISES CLÍNICAS</option>
+<option>ELETRÔNICA</option>
+<option>PUBLICIDADE</option>
+<option>QUÍMICA</option>
+</select>
+</div>
+<div class="field">
+<label for="senha">Senha inicial</label>
+<input id="senha" required="" type="password" minlength="8" autocomplete="new-password" placeholder="Crie uma senha inicial"/>
+<small>Mínimo 8 caracteres, com maiúscula, minúscula, número e símbolo.</small>
+</div>
+</div>
+<div class="form-actions">
+<button class="btn success" type="submit">Cadastrar aluno</button>
+</div>
+</form></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script>
+    if (SESSAO.role !== "ADMINISTRADOR") location.replace("dashboard.html");
+
+    const form = document.getElementById("form");
+    const alerta = document.getElementById("alerta");
+    const campos = {
+      nome: document.getElementById("nome"),
+      email: document.getElementById("email"),
+      matricula: document.getElementById("matricula"),
+      turma: document.getElementById("turma"),
+      curso: document.getElementById("curso"),
+      senha: document.getElementById("senha"),
+    };
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        const aluno = {
+          nome: campos.nome.value.trim(),
+          email: campos.email.value.trim(),
+          matricula: campos.matricula.value.trim(),
+          turma: campos.turma.value.trim(),
+          curso: campos.curso.value,
+          senha: campos.senha.value,
+        };
+
+        const resposta = await api("/api/v1/alunos", {
+          method: "POST",
+          body: JSON.stringify({ aluno }),
+        });
+
+        mostrarAlerta(alerta, "ok", `✓ ${resposta.message}. O aluno já pode entrar com e-mail ou matrícula.`);
+        form.reset();
+        campos.senha.focus();
+      } catch (error) {
+        mostrarAlerta(alerta, "error", error.message);
+      }
+    });
+  </script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

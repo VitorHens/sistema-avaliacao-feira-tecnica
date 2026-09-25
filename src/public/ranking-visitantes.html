@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d38">
+  <title>Ranking dos visitantes | Feira Técnica 2026</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<header class="topo">
+  <div class="container topo-inner">
+    <a class="marca" href="index.html"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Mostra de Projetos 2026</small></div></a>
+    <nav class="nav"><a class="botao secundario" href="index.html">Projetos</a><a class="botao secundario" href="ranking.html">Ranking dos professores</a><a class="botao" href="login.html">Acesso interno</a></nav>
+  </div>
+</header>
+
+<section class="ranking-hero public-ranking-compact">
+  <div class="container ranking-hero-grid">
+    <div><span class="selo">Votação do público</span><h1>Ranking dos visitantes</h1><p>Cada posição representa um projeto, pela média das notas de 1 a 5 dadas pelos visitantes. Este ranking não altera a classificação dos professores.</p><p><a href="ranking.html">Ver ranking dos professores ↗</a></p></div>
+    <button class="btn" id="refreshRanking" type="button">Atualizar ranking ↻</button><div class="live-box"><div><strong>Última atualização</strong><small id="ultima" role="status" aria-live="polite">Carregando...</small></div></div>
+  </div>
+</section>
+
+<main id="conteudo" class="ranking-main">
+  <div class="container">
+    <section id="podio" class="podium"><div class="estado">Aguardando avaliações...</div></section>
+    <section class="ranking-table-wrap">
+      <div class="ranking-title"><div><h2>Projetos e equipes</h2><p>O filtro mantém a posição geral de cada equipe.</p></div><div class="field"><select aria-label="Filtrar classificação por curso" id="filtroCurso"><option value="TODOS">Todos os cursos</option></select></div></div>
+      <div id="lista" class="ranking-list"><div class="estado">Carregando classificação...</div></div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer"><div class="container">Feira Técnica 2026 · UNIVAP · avaliação dos visitantes</div></footer>
+<script src="js/public-utils.js"></script>
+<script>
+const {escapeHtml,formatScore,repairDeep}=PublicUtils;let rankingAtual=[],rankingPorCursoAtual={};
+function equipeTexto(item){return (item.equipe||[]).map(p=>p.nome+(p.turma?" · "+p.turma:"")).join("; ")||"Equipe não informada";}
+const medalha=p=>p===1?'1º':p===2?'2º':p===3?'3º':`${p}º`;
+function renderPodio(ranking){const top=ranking.slice(0,3);document.getElementById('podio').classList.toggle('single-team',top.length===1);document.getElementById('podio').innerHTML=top.length?top.map(i=>`<article class="podium-card"><div class="podium-medal">${medalha(i.posicao)}</div><span>${escapeHtml(i.curso)}</span><h2>${escapeHtml(i.tema)}</h2><p class="ranking-members">${escapeHtml(equipeTexto(i))}</p><strong>${formatScore(i.media)} / 5</strong><small>${i.avaliacoes} ${i.avaliacoes===1?'avaliação':'avaliações'}</small><a href="projeto.html?id=${encodeURIComponent(i.projetoId)}">Ver projeto</a></article>`).join(''):'<div class="estado">Ainda não há projetos classificados.</div>'}
+function renderLista(ranking){document.getElementById('lista').innerHTML=ranking.length?ranking.map(i=>`<a class="ranking-row" href="projeto.html?id=${encodeURIComponent(i.projetoId)}"><div class="ranking-pos">${medalha(i.posicao)}</div><div class="ranking-project"><strong>${escapeHtml(i.tema)}</strong><span>${escapeHtml(i.curso)}</span><span class="ranking-members">${escapeHtml(equipeTexto(i))}</span></div><div class="ranking-count">${i.avaliacoes}<small>${i.avaliacoes===1?'avaliação':'avaliações'}</small></div><div class="ranking-score">${formatScore(i.media)} / 5<small>média</small></div></a>`).join(''):'<div class="estado">Nenhum projeto classificado.</div>'}
+function atualizarFiltro(){const sel=document.getElementById('filtroCurso'),atual=sel.value,cursos=Object.keys(rankingPorCursoAtual).sort((a,b)=>a.localeCompare(b,'pt-BR'));sel.innerHTML='<option value="TODOS">Todos os cursos</option>'+cursos.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');sel.value=cursos.includes(atual)?atual:'TODOS'}
+function aplicar(){const c=document.getElementById('filtroCurso').value,r=c==='TODOS'?rankingAtual:(rankingPorCursoAtual[c]||[]);renderPodio(r);renderLista(r)}
+async function atualizar(){try{const r=await fetch('api/v1/avaliacoes-visitantes/ranking',{cache:'no-store'}),d=repairDeep(await r.json());if(!r.ok)throw new Error();rankingAtual=d?.data?.ranking||[];rankingPorCursoAtual=d?.data?.rankingPorCurso||{};if(rankingAtual.some(i=>!i.equipe?.length)){try{const pr=await fetch("api/v1/projetos/publicos"),pd=repairDeep(await pr.json());if(pr.ok){const teams=new Map((pd.data?.projetos||[]).map(p=>[p.id,[p.representante,...(p.integrantes||[])].filter(Boolean).map(x=>({nome:x.nome,turma:x.turma}))]));for(const item of [...rankingAtual,...Object.values(rankingPorCursoAtual).flat()]){if(!item.equipe?.length)item.equipe=teams.get(item.projetoId)||[];}}}catch(_){/* Mantém o ranking disponível se a consulta da equipe falhar. */}}atualizarFiltro();aplicar();document.getElementById('ultima').textContent=new Date(d?.data?.atualizadoEm||Date.now()).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(_){document.getElementById('ultima').textContent='Sem conexão — tente atualizar';if(!rankingAtual.length){document.getElementById('podio').innerHTML='<div class="estado">A classificação está indisponível neste momento.</div>';document.getElementById('lista').innerHTML='<div class="estado">Use Atualizar ranking para tentar novamente.</div>'}}}
+document.getElementById('filtroCurso').addEventListener('change',aplicar);document.getElementById('refreshRanking').addEventListener('click',atualizar);atualizar();setInterval(()=>{if(!document.hidden)atualizar()},30000);
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

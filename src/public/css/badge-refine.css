@@ -1,0 +1,28 @@
+/* Crachás separados em tela e na folha A4. */
+.badge-page .badge-layout-clean{gap:32px;grid-template-columns:minmax(290px,350px) minmax(0,1fr)}
+.badge-page .badge-config-clean{position:static;padding:26px}.badge-page .badge-preview-clean{padding:28px;min-width:0}.badge-page .student-card-header{gap:18px;flex-wrap:wrap}.badge-page .badge-size{white-space:nowrap}
+.badge-page .badge-sheet{width:100%;aspect-ratio:auto;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto;gap:28px;padding:22px;background:#f3f1ec;overflow:visible}
+.badge-page .badge-quarter{padding:12px;min-height:0;border:1px dashed #ddd6ca;background:transparent;aspect-ratio:105/148.5}.badge-page .badge-quarter:nth-child(n+3){display:none}.badge-page .badge-quarter.empty{display:none}
+.badge-page .print-badge{width:100%;max-width:340px;aspect-ratio:95/138.5;border-radius:12px;background:#fff;border:1px solid #ddd6ca;box-shadow:0 10px 25px #152c3415;container-type:inline-size}
+.badge-page .print-badge .badge-blue-top{height:4%;background:#101f32;border-radius:0;transform:none}.badge-page .badge-blue-top:after,.badge-page .badge-blue-bottom,.badge-page .badge-band-bottom,.badge-page .badge-clip{display:none}
+.badge-page .print-badge .badge-logo{top:7%;width:82%;height:16%;left:50%;object-fit:contain;background:white;padding:2%;transform:translateX(-50%)}
+.badge-page .badge-event{position:absolute;top:24%;left:5%;width:90%;text-align:center;font-size:clamp(6px,2.65cqw,10px);letter-spacing:.7px;color:#424e5d;font-weight:650}
+.badge-page .print-badge .badge-photo{top:32%;left:50%;transform:translateX(-50%);width:42%;height:32%;border:2px solid #f3f1ec;border-radius:8px;background:#f3f1ec}
+
+
+.badge-page .print-badge .badge-copy{top:69%;bottom:auto;left:7%;width:86%;padding:0;text-align:center;color:#101f32}
+.badge-page .print-badge .badge-name{color:#101f32!important;font-size:clamp(12px,6cqw,22px);font-weight:750;line-height:1.15;text-shadow:none;overflow-wrap:anywhere}
+.badge-page .print-badge .badge-role{display:inline-block;color:#424e5d!important;background:#f3f1ec;border-radius:20px;padding:5px 10px;font-size:clamp(8px,3.5cqw,12px);margin:9px 0 0;text-shadow:none;letter-spacing:.4px}
+.badge-page .badge-course{font-size:clamp(8px,3.2cqw,11px);color:#424e5d;margin:7px 0;line-height:1.4}.badge-page .badge-footer-note{position:absolute;bottom:0;left:0;width:100%;background:#101f32;color:#dfc99f;padding:4% 3%;text-align:center;font-size:clamp(6px,2.5cqw,9px);letter-spacing:.6px}
+.badge-page .badge-person-clean{padding:22px 0}.badge-page .badge-form-grid{gap:18px}.badge-page .badge-photo-button{margin-top:5px}.badge-page .badge-print-button{margin-top:10px}
+@media(max-width:1250px){.badge-page .badge-layout-clean{grid-template-columns:1fr}.badge-page .badge-sheet{max-width:760px}.badge-page .badge-config-clean{max-width:none}}
+@media(max-width:600px){.badge-page .badge-sheet{grid-template-columns:1fr;padding:16px;gap:26px}.badge-page .badge-quarter{max-width:330px;width:100%;margin:auto;padding:12px}.badge-page .badge-preview-clean,.badge-page .badge-config-clean{padding:20px}.badge-page .badge-layout-clean{gap:26px}}
+@media print{
+ .badge-page .badge-sheet{width:210mm!important;height:297mm!important;padding:0!important;gap:0!important;grid-template-columns:105mm 105mm!important;grid-template-rows:148.5mm 148.5mm!important;overflow:hidden!important}
+ .badge-page .badge-quarter{width:105mm!important;height:148.5mm!important;min-height:0!important;max-width:none!important;padding:5mm!important;margin:0!important;aspect-ratio:auto!important;border:0!important;display:flex!important}
+ .badge-page .badge-quarter.empty{display:none!important}
+ .badge-page .print-badge{width:95mm!important;height:138.5mm!important;max-width:none!important;border:0!important;border-radius:3mm!important;box-shadow:none!important;aspect-ratio:auto!important}
+ .badge-page .print-badge .badge-logo{width:82%!important;height:16%!important;top:7%!important}
+ .badge-page .print-badge .badge-name{font-size:17pt!important;color:#101f32!important;line-height:1.15!important}
+ .badge-page .print-badge .badge-role{font-size:9pt!important;color:#424e5d!important}.badge-page .badge-course{font-size:8pt!important}.badge-page .badge-event{font-size:7pt!important}.badge-page .badge-footer-note{font-size:6.5pt!important}
+}

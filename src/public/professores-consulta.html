@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Professores | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+<link rel="stylesheet" href="css/experience.css">
+<link rel="icon" type="image/png" href="imagens/logo.png">
+<link rel="stylesheet" href="css/site-brand.css">
+<link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Área interna</small></div></div>
+    <nav class="nav-list"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Painel</a><a class="nav-link  " href="projetos-consulta.html"><span class="ico">◇</span>Projetos</a><a class="nav-link  " href="avaliacoes-cadastro.html"><span class="ico">★</span>Avaliar</a><a class="nav-link  " href="avaliacoes-consulta.html"><span class="ico">✓</span>Avaliações</a><a class="nav-link  " href="ranking.html"><span class="ico">↗</span>Ranking</a><a class="nav-link  admin-only" href="receberExcel.html"><span class="ico">⇩</span>Importar</a><a class="nav-link active admin-only" href="professores-consulta.html"><span class="ico">♙</span>Professores</a><a class="nav-link  admin-only" href="alunos-consulta.html"><span class="ico">◎</span>Alunos</a></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Professores</h1><p>O professor entra com o ID informado pela escola; o administrador entra por e-mail.</p></div><div class="top-actions"><a class="btn ghost sm" href="dashboard.html">Painel</a><button class="btn sm" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main"><section class="workspace-story" aria-label="Sobre esta área"><div><span class="story-kicker">ORGANIZAÇÃO / BANCA · UNIVAP CENTRO</span><h2>Quem ajuda as ideias <em>a crescer.</em></h2><p>Encontre professores, confira suas funções e gerencie os acessos da banca.</p></div></section><div class="alert show info" id="alerta">Carregando professores...</div>
+<div class="toolbar"><a class="btn" href="professores-novo.html">Cadastrar professor</a><a class="btn light" href="professores-importar.html">Importar planilha de professores</a><button class="btn" id="recarregar">Recarregar</button></div>
+<div class="table-wrap"><table><thead><tr><th>Nome</th><th>ID de acesso</th><th>E-mail</th><th>Função</th><th>Ações</th></tr></thead><tbody id="tbody"></tbody></table></div></main>
+  </div>
+</div>
+<script src="js/auth.js"></script><script>
+
+const alerta = document.getElementById("alerta"), tbody = document.getElementById("tbody");
+async function carregar() {
+  try {
+    mostrarAlerta(alerta,"info","Carregando professores...");
+    const r = await api("/api/v1/professores");
+    const itens = r.data.professores || [];
+    tbody.innerHTML = itens.map(p => `<tr>
+      <td>${escapeHtml(p.nome)}</td><td class="mono">${escapeHtml(p.identificador||'—')}</td><td>${escapeHtml(p.email||'—')}</td><td><span class="badge">${escapeHtml(p.role)}</span></td>
+      <td><a class="btn sec" href="professores-editar.html?id=${encodeURIComponent(p.id)}">Editar</a></td>
+    </tr>`).join("");
+    mostrarAlerta(alerta,"ok",`✓ ${itens.length} professor(es) encontrado(s).`);
+  } catch(e) { mostrarAlerta(alerta,"error",e.message); }
+}
+document.getElementById("recarregar").onclick = carregar; carregar();
+
+</script><script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>

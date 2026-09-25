@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Importar professores | Feira Técnica</title>
+  <link rel="stylesheet" href="css/feira.css">
+  <link rel="stylesheet" href="css/school-refine.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="icon" type="image/png" href="imagens/logo.png">
+  <link rel="stylesheet" href="css/site-brand.css">
+  <link rel="stylesheet" href="css/visual-system.css">
+</head>
+<body class="experience">
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img src="imagens/logo.png" alt="UNIVAP"><div>Feira Técnica<small>Administração</small></div></div>
+    <nav class="nav-list"></nav>
+    <div class="sidebar-foot"><div class="profile-mini"><strong data-usuario>Usuário</strong><span>Feira Técnica 2026</span><button class="logout" type="button" data-sair>Sair</button></div></div>
+  </aside>
+  <div class="content">
+    <header class="topbar"><div><h1>Importar professores</h1><p>Cadastre os acessos da banca a partir de um CSV.</p></div><div class="top-actions"><a class="btn ghost sm" href="professores-consulta.html">Voltar à lista</a><button class="btn sm" type="button" data-sair>Sair</button></div></header>
+    <main id="conteudo" class="main">
+      <section class="workspace-story"><div><span class="story-kicker">ORGANIZAÇÃO / BANCA</span><h2>Cadastre a banca <em>em uma etapa.</em></h2><p>Exporte a planilha do Excel como CSV, confira os dados e importe os professores.</p></div></section>
+      <div class="card">
+        <label class="upload-area" for="arquivoCsv"><strong>Selecione a planilha de professores</strong><span>Exporte como CSV UTF-8. As colunas obrigatórias são ID e Nome.</span><span id="nomeArquivo" hidden></span></label>
+        <input type="file" id="arquivoCsv" accept=".csv,text/csv" aria-label="Selecionar planilha CSV de professores">
+        <p class="help">Use exatamente o ID numérico recebido da escola, preservando zeros à esquerda. Formate a coluna ID como texto no Excel. Email é opcional para avaliadores; Funcao e Senha também são opcionais. A senha inicial dos avaliadores é <strong>univap</strong>. O resultado mostra quais IDs foram cadastrados.</p>
+        <div class="import-actions"><a href="modelo-professores.csv" download>Baixar modelo da planilha ↓</a><button class="btn" id="btnEnviar" type="button">Importar professores</button><button class="btn light" id="baixarResultado" type="button" hidden>Baixar resultado da importação</button></div>
+      </div>
+      <section class="log-container" aria-label="Resultado da importação"><div class="log-heading"><span>Resultado da importação</span><span id="statusContador">Aguardando arquivo</span></div><div id="log" class="import-log" role="log" aria-live="polite">Selecione um CSV para começar.</div></section>
+    </main>
+  </div>
+</div>
+<script src="js/auth.js"></script>
+<script src="js/csv.js"></script>
+<script src="js/professor-import.js"></script>
+<script>
+if (SESSAO.role !== 'ADMINISTRADOR') location.replace('dashboard.html');
+const arquivo = document.getElementById('arquivoCsv');
+const botao = document.getElementById('btnEnviar');
+const log = document.getElementById('log');
+const contador = document.getElementById('statusContador');
+const baixarResultado = document.getElementById('baixarResultado');
+let resultados = [];
+arquivo.addEventListener('change', () => {
+  const nome = document.getElementById('nomeArquivo');
+  nome.textContent = arquivo.files[0]?.name || '';
+  nome.hidden = !arquivo.files.length;
+});
+function registrar(mensagem, erro = false) {
+  const linha = document.createElement('div');
+  linha.textContent = mensagem;
+  linha.style.color = erro ? '#a01829' : '#173454';
+  log.appendChild(linha);
+}
+botao.addEventListener('click', async () => {
+  if (!arquivo.files.length) { contador.textContent = 'Selecione um CSV'; return; }
+  botao.disabled = true;
+  baixarResultado.hidden = true;
+  resultados = [];
+  log.textContent = '';
+  let criados = 0, falhas = 0;
+  try {
+    const linhas = FeiraProfessoresImport.prepararLinhas(await arquivo.files[0].text());
+    for (const [indice, linha] of linhas.entries()) {
+      contador.textContent = `${indice + 1} de ${linhas.length}`;
+      const resultadoLinha = {numero:linha.numero,nome:linha.nome,email:linha.email,role:linha.role,id:linha.identificador,resultado:''};
+      if (linha.erro) {
+        falhas++;
+        resultadoLinha.resultado = linha.erro;
+        resultados.push(resultadoLinha);
+        registrar(`Linha ${linha.numero}: ${linha.erro}`, true);
+        continue;
+      }
+      try {
+        const resposta=await api('/api/v1/professores', {method:'POST',body:JSON.stringify({professor:linha.professor})});
+        const id=resposta?.data?.professor?.identificador;
+        if(id!==linha.identificador) throw new Error('O ID retornado não corresponde ao da planilha. Confira a lista de professores antes de repetir esta linha.');
+        criados++;
+        resultadoLinha.id=id;
+        resultadoLinha.resultado='Cadastrado';
+        registrar(`Linha ${linha.numero}: ${linha.nome} cadastrado. ID: ${id}`);
+      } catch (error) {
+        falhas++;
+        resultadoLinha.resultado=error.message||'Falha no cadastro.';
+        registrar(`Linha ${linha.numero} · ID ${linha.identificador}: ${resultadoLinha.resultado}`, true);
+      }
+      resultados.push(resultadoLinha);
+    }
+    contador.textContent = `${criados} cadastrados, ${falhas} falhas`;
+    baixarResultado.hidden = resultados.length === 0;
+  } catch (error) {
+    contador.textContent = 'Importação interrompida';
+    registrar(error.message, true);
+  } finally { botao.disabled = false; }
+});
+baixarResultado.addEventListener('click',()=>{
+  if(!resultados.length)return;
+  const csv=FeiraProfessoresImport.gerarCsvResultado(resultados);
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const link=document.createElement('a');
+  link.href=url;
+  link.download='resultado-importacao-professores.csv';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+</script>
+<script src="js/navigation.js"></script>
+<script src="js/ui-effects.js"></script>
+<script src="js/experience.js"></script>
+</body>
+</html>
